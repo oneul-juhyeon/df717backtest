@@ -1,5 +1,7 @@
 import { TrendingUp, ExternalLink } from "lucide-react";
+import { Link } from "react-router-dom";
 import MetricCard from "./MetricCard";
+import EquityCurveChart from "./charts/EquityCurveChart";
 
 const performanceMetrics = [
   { value: "€722,988.07", label: "TOTAL NET PROFIT", highlight: true },
@@ -50,48 +52,26 @@ const PerformanceMetrics = () => {
         ))}
       </div>
 
-      {/* Equity curve placeholder */}
+      {/* Equity curve with interactive chart */}
       <div className="chart-container">
         <div className="flex items-center justify-between mb-4">
           <p className="text-sm text-muted-foreground">
             Equity Curve in EUR (2016-2026) — €10,000 → €732,988
           </p>
         </div>
-        <div className="h-64 bg-gradient-to-r from-primary/5 via-success/10 to-success/20 rounded-lg flex items-end justify-center relative overflow-hidden">
-          {/* Simulated equity curve */}
-          <svg className="w-full h-full" viewBox="0 0 400 150" preserveAspectRatio="none">
-            <defs>
-              <linearGradient id="equityGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor="hsl(142 70% 45%)" stopOpacity="0.3" />
-                <stop offset="100%" stopColor="hsl(142 70% 45%)" stopOpacity="0.05" />
-              </linearGradient>
-            </defs>
-            <path
-              d="M0,140 Q50,130 100,120 T150,100 T200,80 T250,60 T300,40 T350,25 L400,10 L400,150 L0,150 Z"
-              fill="url(#equityGradient)"
-            />
-            <path
-              d="M0,140 Q50,130 100,120 T150,100 T200,80 T250,60 T300,40 T350,25 L400,10"
-              fill="none"
-              stroke="hsl(142 70% 45%)"
-              strokeWidth="2"
-            />
-          </svg>
-          <div className="absolute bottom-4 right-4 flex items-center gap-2 text-success text-sm font-mono">
-            <TrendingUp className="w-4 h-4" />
-            +7,229%
-          </div>
+        <div className="bg-card/50 rounded-lg p-4 border border-border">
+          <EquityCurveChart />
         </div>
       </div>
 
       {/* View full report link */}
-      <a 
-        href="#"
+      <Link 
+        to="/backtest-report"
         className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors text-sm"
       >
         <ExternalLink className="w-4 h-4" />
         View Full Backtest Report
-      </a>
+      </Link>
     </div>
   );
 };
