@@ -58,11 +58,11 @@ const CorrelationEquityChart = ({ showCombined = false }: CorrelationEquityChart
           <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
           <XAxis 
             dataKey="date" 
-            tickFormatter={(value) => value.split('-')[0]}
+            tickFormatter={formatDate}
             stroke="hsl(var(--muted-foreground))"
-            fontSize={12}
+            fontSize={11}
             tickLine={false}
-            interval={3}
+            interval={2}
           />
           <YAxis 
             tickFormatter={(value) => `€${(value / 1000).toFixed(0)}K`}
@@ -82,7 +82,8 @@ const CorrelationEquityChart = ({ showCombined = false }: CorrelationEquityChart
               dataKey="combined"
               stroke="hsl(170 60% 50%)"
               strokeWidth={2.5}
-              dot={false}
+              dot={{ r: 3, fill: "hsl(170 60% 50%)" }}
+              activeDot={{ r: 5, stroke: "hsl(170 60% 50%)", strokeWidth: 2, fill: "#fff" }}
               name="Combined Portfolio"
             />
           ) : (
@@ -92,7 +93,8 @@ const CorrelationEquityChart = ({ showCombined = false }: CorrelationEquityChart
                 dataKey="dfcovenant"
                 stroke="hsl(170 60% 50%)"
                 strokeWidth={2}
-                dot={false}
+                dot={{ r: 2, fill: "hsl(170 60% 50%)" }}
+                activeDot={{ r: 4, stroke: "hsl(170 60% 50%)", strokeWidth: 2, fill: "#fff" }}
                 name="DFcovenant"
               />
               <Line
@@ -100,7 +102,8 @@ const CorrelationEquityChart = ({ showCombined = false }: CorrelationEquityChart
                 dataKey="madTurtle"
                 stroke="hsl(45 93% 47%)"
                 strokeWidth={2}
-                dot={false}
+                dot={{ r: 2, fill: "hsl(45 93% 47%)" }}
+                activeDot={{ r: 4, stroke: "hsl(45 93% 47%)", strokeWidth: 2, fill: "#fff" }}
                 name="Mad Turtle"
               />
               <Line
@@ -108,7 +111,8 @@ const CorrelationEquityChart = ({ showCombined = false }: CorrelationEquityChart
                 dataKey="goldPhantom"
                 stroke="hsl(142 70% 45%)"
                 strokeWidth={2}
-                dot={false}
+                dot={{ r: 2, fill: "hsl(142 70% 45%)" }}
+                activeDot={{ r: 4, stroke: "hsl(142 70% 45%)", strokeWidth: 2, fill: "#fff" }}
                 name="Gold Phantom"
               />
             </>
