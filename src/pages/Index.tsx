@@ -12,9 +12,9 @@ const Index = () => {
       </main>
       
       {/* Footer */}
-      <footer className="border-t border-border py-8 mt-16">
+      <footer className="border-t border-white/10 py-8 mt-16">
         <div className="container mx-auto px-6 text-center">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-white/40">
             © 2024 DF717. Professional Expert Advisors for MetaTrader 5.
           </p>
         </div>

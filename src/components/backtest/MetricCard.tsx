@@ -9,14 +9,14 @@ interface MetricCardProps {
 
 const MetricCard = ({ value, label, highlight = false, className }: MetricCardProps) => {
   return (
-    <div className={cn("metric-card text-center", className)}>
+    <div className={cn("metric-card text-center border-white/10", className)}>
       <div className={cn(
-        "text-2xl md:text-3xl font-bold font-mono mb-2",
-        highlight ? "text-warning" : "text-primary"
+        "text-2xl md:text-3xl font-semibold tracking-tight mb-2",
+        highlight ? "text-warning" : "text-foreground"
       )}>
         {value}
       </div>
-      <div className="text-xs text-muted-foreground tracking-wider uppercase">
+      <div className="text-xs text-white/40 tracking-widest uppercase">
         {label}
       </div>
     </div>
