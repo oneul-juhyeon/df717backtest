@@ -11,16 +11,19 @@ const formatCurrency = (value: number) => {
 };
 
 const formatDate = (dateStr: string) => {
+  return dateStr; // Show as YYYY-MM format
+};
+
+const formatTooltipDate = (dateStr: string) => {
   const [year, month] = dateStr.split('-');
-  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  return `${monthNames[parseInt(month) - 1]} ${year}`;
+  return `${year}-${month}-01`; // Show as YYYY-MM-DD format
 };
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-card border border-border rounded-lg p-4 shadow-lg">
-        <p className="text-sm text-muted-foreground mb-3 font-medium">{formatDate(label)}</p>
+      <div className="bg-card/95 backdrop-blur border border-border rounded-lg p-3 shadow-lg">
+        <p className="text-sm text-foreground mb-2 font-bold">{formatTooltipDate(label)}</p>
         <div className="space-y-2">
           {payload.map((entry: any, index: number) => (
             <div key={index} className="flex items-center justify-between gap-4">
@@ -81,8 +84,8 @@ const CorrelationEquityChart = ({ showCombined = false }: CorrelationEquityChart
               type="monotone"
               dataKey="combined"
               stroke="hsl(170 60% 50%)"
-              strokeWidth={2.5}
-              dot={{ r: 3, fill: "hsl(170 60% 50%)" }}
+              strokeWidth={2}
+              dot={false}
               activeDot={{ r: 5, stroke: "hsl(170 60% 50%)", strokeWidth: 2, fill: "#fff" }}
               name="Combined Portfolio"
             />
@@ -93,7 +96,7 @@ const CorrelationEquityChart = ({ showCombined = false }: CorrelationEquityChart
                 dataKey="dfcovenant"
                 stroke="hsl(170 60% 50%)"
                 strokeWidth={2}
-                dot={{ r: 2, fill: "hsl(170 60% 50%)" }}
+                dot={false}
                 activeDot={{ r: 4, stroke: "hsl(170 60% 50%)", strokeWidth: 2, fill: "#fff" }}
                 name="DFcovenant"
               />
@@ -102,7 +105,7 @@ const CorrelationEquityChart = ({ showCombined = false }: CorrelationEquityChart
                 dataKey="madTurtle"
                 stroke="hsl(45 93% 47%)"
                 strokeWidth={2}
-                dot={{ r: 2, fill: "hsl(45 93% 47%)" }}
+                dot={false}
                 activeDot={{ r: 4, stroke: "hsl(45 93% 47%)", strokeWidth: 2, fill: "#fff" }}
                 name="Mad Turtle"
               />
@@ -111,7 +114,7 @@ const CorrelationEquityChart = ({ showCombined = false }: CorrelationEquityChart
                 dataKey="goldPhantom"
                 stroke="hsl(142 70% 45%)"
                 strokeWidth={2}
-                dot={{ r: 2, fill: "hsl(142 70% 45%)" }}
+                dot={false}
                 activeDot={{ r: 4, stroke: "hsl(142 70% 45%)", strokeWidth: 2, fill: "#fff" }}
                 name="Gold Phantom"
               />

@@ -2,16 +2,19 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { drawdownComparisonData } from "@/data/correlationData";
 
 const formatDate = (dateStr: string) => {
+  return dateStr;
+};
+
+const formatTooltipDate = (dateStr: string) => {
   const [year, month] = dateStr.split('-');
-  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  return `${monthNames[parseInt(month) - 1]} ${year}`;
+  return `${year}-${month}-01`;
 };
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-card border border-border rounded-lg p-4 shadow-lg">
-        <p className="text-sm text-muted-foreground mb-3 font-medium">{formatDate(label)}</p>
+      <div className="bg-card/95 backdrop-blur border border-border rounded-lg p-3 shadow-lg">
+        <p className="text-sm text-foreground mb-2 font-bold">{formatTooltipDate(label)}</p>
         <div className="space-y-2">
           {payload.map((entry: any, index: number) => (
             <div key={index} className="flex items-center justify-between gap-4">
@@ -70,8 +73,8 @@ const DrawdownComparisonChart = () => {
             stroke="hsl(170 60% 50%)"
             fill="hsl(170 60% 50% / 0.2)"
             strokeWidth={2}
-            dot={{ r: 2, fill: "hsl(170 60% 50%)" }}
-            activeDot={{ r: 4, stroke: "hsl(170 60% 50%)", strokeWidth: 2, fill: "#fff" }}
+            dot={false}
+            activeDot={{ r: 5, stroke: "hsl(170 60% 50%)", strokeWidth: 2, fill: "hsl(170 60% 50%)" }}
             name="DFcovenant"
           />
           <Area
@@ -80,8 +83,8 @@ const DrawdownComparisonChart = () => {
             stroke="hsl(45 93% 47%)"
             fill="hsl(45 93% 47% / 0.2)"
             strokeWidth={2}
-            dot={{ r: 2, fill: "hsl(45 93% 47%)" }}
-            activeDot={{ r: 4, stroke: "hsl(45 93% 47%)", strokeWidth: 2, fill: "#fff" }}
+            dot={false}
+            activeDot={{ r: 5, stroke: "hsl(45 93% 47%)", strokeWidth: 2, fill: "hsl(45 93% 47%)" }}
             name="Mad Turtle"
           />
           <Area
@@ -90,8 +93,8 @@ const DrawdownComparisonChart = () => {
             stroke="hsl(142 70% 45%)"
             fill="hsl(142 70% 45% / 0.2)"
             strokeWidth={2}
-            dot={{ r: 2, fill: "hsl(142 70% 45%)" }}
-            activeDot={{ r: 4, stroke: "hsl(142 70% 45%)", strokeWidth: 2, fill: "#fff" }}
+            dot={false}
+            activeDot={{ r: 5, stroke: "hsl(142 70% 45%)", strokeWidth: 2, fill: "hsl(142 70% 45%)" }}
             name="Gold Phantom"
           />
         </AreaChart>
