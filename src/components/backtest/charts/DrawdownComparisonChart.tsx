@@ -45,11 +45,11 @@ const DrawdownComparisonChart = () => {
           <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
           <XAxis 
             dataKey="date" 
-            tickFormatter={(value) => value.split('-')[0]}
+            tickFormatter={formatDate}
             stroke="hsl(var(--muted-foreground))"
-            fontSize={12}
+            fontSize={11}
             tickLine={false}
-            interval={3}
+            interval={2}
           />
           <YAxis 
             tickFormatter={(value) => `${value}%`}
@@ -70,6 +70,8 @@ const DrawdownComparisonChart = () => {
             stroke="hsl(170 60% 50%)"
             fill="hsl(170 60% 50% / 0.2)"
             strokeWidth={2}
+            dot={{ r: 2, fill: "hsl(170 60% 50%)" }}
+            activeDot={{ r: 4, stroke: "hsl(170 60% 50%)", strokeWidth: 2, fill: "#fff" }}
             name="DFcovenant"
           />
           <Area
@@ -78,6 +80,8 @@ const DrawdownComparisonChart = () => {
             stroke="hsl(45 93% 47%)"
             fill="hsl(45 93% 47% / 0.2)"
             strokeWidth={2}
+            dot={{ r: 2, fill: "hsl(45 93% 47%)" }}
+            activeDot={{ r: 4, stroke: "hsl(45 93% 47%)", strokeWidth: 2, fill: "#fff" }}
             name="Mad Turtle"
           />
           <Area
@@ -86,6 +90,8 @@ const DrawdownComparisonChart = () => {
             stroke="hsl(142 70% 45%)"
             fill="hsl(142 70% 45% / 0.2)"
             strokeWidth={2}
+            dot={{ r: 2, fill: "hsl(142 70% 45%)" }}
+            activeDot={{ r: 4, stroke: "hsl(142 70% 45%)", strokeWidth: 2, fill: "#fff" }}
             name="Gold Phantom"
           />
         </AreaChart>

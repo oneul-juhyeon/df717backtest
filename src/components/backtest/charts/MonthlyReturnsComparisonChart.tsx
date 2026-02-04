@@ -65,7 +65,10 @@ const MonthlyReturnsComparisonChart = () => {
             tickLine={false}
             axisLine={false}
           />
-          <Tooltip content={<CustomTooltip />} />
+          <Tooltip 
+            content={<CustomTooltip />} 
+            cursor={{ fill: 'hsl(var(--muted) / 0.3)' }}
+          />
           <Legend 
             wrapperStyle={{ paddingTop: '20px' }}
             formatter={(value) => <span className="text-muted-foreground text-sm">{value}</span>}
