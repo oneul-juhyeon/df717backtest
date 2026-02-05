@@ -23,14 +23,14 @@ const PortfolioCorrelation = () => {
         </div>
         <p className="text-muted-foreground text-sm mb-4">
           <strong>Why this matters:</strong> Many of our clients already trade with popular XAUUSD Expert 
-          Advisors like The Gold Phantom or Mad Turtle. A common concern is whether adding DFcovenant 
+           Advisors like DFpath or DFtrust. A common concern is whether adding DFcovenant 
           to their setup would create overlapping trades, correlated drawdowns, or redundant exposure 
           to the same market conditions.
         </p>
         <p className="text-muted-foreground text-sm mb-4">
           This correlation analysis is provided <strong>for informational purposes only</strong>. Its sole 
           objective is to demonstrate that <strong>DFcovenant can be deployed alongside two of the most 
-          popular XAUUSD Expert Advisors on the MQL5 marketplace</strong> — The Gold Phantom and Mad Turtle — 
+           popular XAUUSD Expert Advisors on the MQL5 marketplace</strong> — DFpath and DFtrust — 
           within the same trading account or multi-strategy setup, without significant overlap in trading 
           signals or equity curve behavior.
         </p>
@@ -89,8 +89,8 @@ const PortfolioCorrelation = () => {
                 <tr className="border-b border-white/10">
                   <th className="text-left py-2 px-3 text-muted-foreground font-medium text-sm"></th>
                   <th className="text-center py-2 px-3 text-muted-foreground font-medium text-sm">DFcovenant</th>
-                  <th className="text-center py-2 px-3 text-muted-foreground font-medium text-sm">Mad Turtle</th>
-                  <th className="text-center py-2 px-3 text-muted-foreground font-medium text-sm">Gold Phantom</th>
+                   <th className="text-center py-2 px-3 text-muted-foreground font-medium text-sm">DFtrust</th>
+                   <th className="text-center py-2 px-3 text-muted-foreground font-medium text-sm">DFpath</th>
                 </tr>
               </thead>
               <tbody>
@@ -123,8 +123,8 @@ const PortfolioCorrelation = () => {
                 <tr className="border-b border-white/10">
                   <th className="text-left py-2 px-3 text-muted-foreground font-medium text-sm"></th>
                   <th className="text-center py-2 px-3 text-muted-foreground font-medium text-sm">DFcovenant</th>
-                  <th className="text-center py-2 px-3 text-muted-foreground font-medium text-sm">Mad Turtle</th>
-                  <th className="text-center py-2 px-3 text-muted-foreground font-medium text-sm">Gold Phantom</th>
+                   <th className="text-center py-2 px-3 text-muted-foreground font-medium text-sm">DFtrust</th>
+                   <th className="text-center py-2 px-3 text-muted-foreground font-medium text-sm">DFpath</th>
                 </tr>
               </thead>
               <tbody>
@@ -182,8 +182,8 @@ const PortfolioCorrelation = () => {
               <tr className="border-b border-white/10">
                 <th className="text-left py-3 px-4 text-muted-foreground font-medium">Metric</th>
                 <th className="text-center py-3 px-4 text-primary font-medium">DFcovenant (XAUUSD)</th>
-                <th className="text-center py-3 px-4 text-muted-foreground font-medium">Mad Turtle (XAUUSD)</th>
-                <th className="text-center py-3 px-4 text-muted-foreground font-medium">The Gold Phantom (XAUUSD)</th>
+                 <th className="text-center py-3 px-4 text-muted-foreground font-medium">DFtrust (XAUUSD)</th>
+                 <th className="text-center py-3 px-4 text-muted-foreground font-medium">DFpath (XAUUSD)</th>
               </tr>
             </thead>
             <tbody>
@@ -191,8 +191,8 @@ const PortfolioCorrelation = () => {
                 <tr key={index} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                   <td className="py-3 px-4 text-muted-foreground font-medium">{row.metric}</td>
                   <td className="py-3 px-4 text-center text-foreground font-mono">{row.dfcovenant}</td>
-                  <td className="py-3 px-4 text-center text-foreground font-mono">{row.madTurtle}</td>
-                  <td className="py-3 px-4 text-center text-foreground font-mono">{row.goldPhantom}</td>
+                   <td className="py-3 px-4 text-center text-foreground font-mono">{row.dftrust}</td>
+                   <td className="py-3 px-4 text-center text-foreground font-mono">{row.dfpath}</td>
                 </tr>
               ))}
             </tbody>

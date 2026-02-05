@@ -64,14 +64,14 @@ const CorrelationReport = () => {
               <div className="space-y-4 text-muted-foreground text-sm">
                 <p>
                   <strong className="text-foreground">Why this matters:</strong> Many of our clients already trade with popular XAUUSD Expert 
-                  Advisors like The Gold Phantom or Mad Turtle. A common concern is whether adding DFcovenant 
+                   Advisors like DFpath or DFtrust. A common concern is whether adding DFcovenant 
                   to their setup would create overlapping trades, correlated drawdowns, or redundant exposure 
                   to the same market conditions.
                 </p>
                 <p>
                   This correlation analysis is provided <strong className="text-foreground">for informational purposes only</strong>. Its sole 
                   objective is to demonstrate that <strong className="text-foreground">DFcovenant can be deployed alongside two of the most 
-                  popular XAUUSD Expert Advisors on the MQL5 marketplace</strong> — The Gold Phantom and Mad Turtle — 
+                   popular XAUUSD Expert Advisors on the MQL5 marketplace</strong> — DFpath and DFtrust — 
                   within the same trading account or multi-strategy setup, without significant overlap in trading 
                   signals or equity curve behavior.
                 </p>
@@ -135,8 +135,8 @@ const CorrelationReport = () => {
                       <tr className="border-b border-white/10">
                         <th className="text-left py-2 px-3 text-muted-foreground font-medium text-sm"></th>
                         <th className="text-center py-2 px-3 text-muted-foreground font-medium text-xs">DFcovenant</th>
-                        <th className="text-center py-2 px-3 text-muted-foreground font-medium text-xs">Mad Turtle</th>
-                        <th className="text-center py-2 px-3 text-muted-foreground font-medium text-xs">Gold Phantom</th>
+                         <th className="text-center py-2 px-3 text-muted-foreground font-medium text-xs">DFtrust</th>
+                         <th className="text-center py-2 px-3 text-muted-foreground font-medium text-xs">DFpath</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -169,8 +169,8 @@ const CorrelationReport = () => {
                       <tr className="border-b border-white/10">
                         <th className="text-left py-2 px-3 text-muted-foreground font-medium text-sm"></th>
                         <th className="text-center py-2 px-3 text-muted-foreground font-medium text-xs">DFcovenant</th>
-                        <th className="text-center py-2 px-3 text-muted-foreground font-medium text-xs">Mad Turtle</th>
-                        <th className="text-center py-2 px-3 text-muted-foreground font-medium text-xs">Gold Phantom</th>
+                         <th className="text-center py-2 px-3 text-muted-foreground font-medium text-xs">DFtrust</th>
+                         <th className="text-center py-2 px-3 text-muted-foreground font-medium text-xs">DFpath</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -260,8 +260,8 @@ const CorrelationReport = () => {
                     <tr className="border-b border-white/10 bg-card/50">
                       <th className="text-left py-4 px-4 text-muted-foreground font-medium">Metric</th>
                       <th className="text-center py-4 px-4 text-primary font-medium">DFcovenant</th>
-                      <th className="text-center py-4 px-4 text-muted-foreground font-medium">Mad Turtle</th>
-                      <th className="text-center py-4 px-4 text-muted-foreground font-medium">Gold Phantom</th>
+                       <th className="text-center py-4 px-4 text-muted-foreground font-medium">DFtrust</th>
+                       <th className="text-center py-4 px-4 text-muted-foreground font-medium">DFpath</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -269,8 +269,8 @@ const CorrelationReport = () => {
                       <tr key={index} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                         <td className="py-3 px-4 text-muted-foreground font-medium">{row.metric}</td>
                         <td className="py-3 px-4 text-center text-foreground font-mono">{row.dfcovenant}</td>
-                        <td className="py-3 px-4 text-center text-foreground font-mono">{row.madTurtle}</td>
-                        <td className="py-3 px-4 text-center text-foreground font-mono">{row.goldPhantom}</td>
+                         <td className="py-3 px-4 text-center text-foreground font-mono">{row.dftrust}</td>
+                         <td className="py-3 px-4 text-center text-foreground font-mono">{row.dfpath}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -298,7 +298,7 @@ const CorrelationReport = () => {
               <div className="border border-white/10 rounded-xl p-6 bg-card/30">
                 <h4 className="font-semibold mb-3 text-primary">Compatibility</h4>
                 <p className="text-sm text-muted-foreground">
-                  DFcovenant can be safely deployed alongside Mad Turtle and Gold Phantom without significant overlap.
+                   DFcovenant can be safely deployed alongside DFtrust and DFpath without significant overlap.
                 </p>
               </div>
             </div>

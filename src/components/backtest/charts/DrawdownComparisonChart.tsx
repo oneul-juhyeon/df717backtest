@@ -79,23 +79,23 @@ const DrawdownComparisonChart = () => {
           />
           <Area
             type="monotone"
-            dataKey="madTurtle"
+           dataKey="dftrust"
             stroke="hsl(45 93% 47%)"
             fill="hsl(45 93% 47% / 0.2)"
             strokeWidth={2}
             dot={false}
-            activeDot={{ r: 5, stroke: "hsl(45 93% 47%)", strokeWidth: 2, fill: "hsl(45 93% 47%)" }}
-            name="Mad Turtle"
+           activeDot={{ r: 5, stroke: "hsl(45 93% 47%)", strokeWidth: 2, fill: "hsl(45 93% 47%)" }}
+             name="DFtrust"
           />
           <Area
             type="monotone"
-            dataKey="goldPhantom"
+           dataKey="dfpath"
             stroke="hsl(142 70% 45%)"
             fill="hsl(142 70% 45% / 0.2)"
             strokeWidth={2}
             dot={false}
-            activeDot={{ r: 5, stroke: "hsl(142 70% 45%)", strokeWidth: 2, fill: "hsl(142 70% 45%)" }}
-            name="Gold Phantom"
+           activeDot={{ r: 5, stroke: "hsl(142 70% 45%)", strokeWidth: 2, fill: "hsl(142 70% 45%)" }}
+             name="DFpath"
           />
         </AreaChart>
       </ResponsiveContainer>

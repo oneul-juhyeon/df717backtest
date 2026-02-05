@@ -102,21 +102,21 @@ const CorrelationEquityChart = ({ showCombined = false }: CorrelationEquityChart
               />
               <Line
                 type="monotone"
-                dataKey="madTurtle"
+               dataKey="dftrust"
                 stroke="hsl(45 93% 47%)"
                 strokeWidth={2}
                 dot={false}
-                activeDot={{ r: 4, stroke: "hsl(45 93% 47%)", strokeWidth: 2, fill: "#fff" }}
-                name="Mad Turtle"
+               activeDot={{ r: 4, stroke: "hsl(45 93% 47%)", strokeWidth: 2, fill: "#fff" }}
+                 name="DFtrust"
               />
               <Line
                 type="monotone"
-                dataKey="goldPhantom"
+               dataKey="dfpath"
                 stroke="hsl(142 70% 45%)"
                 strokeWidth={2}
                 dot={false}
-                activeDot={{ r: 4, stroke: "hsl(142 70% 45%)", strokeWidth: 2, fill: "#fff" }}
-                name="Gold Phantom"
+               activeDot={{ r: 4, stroke: "hsl(142 70% 45%)", strokeWidth: 2, fill: "#fff" }}
+                 name="DFpath"
               />
             </>
           )}
