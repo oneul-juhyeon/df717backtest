@@ -1,4 +1,4 @@
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area } from "recharts";
 import { equityCurveData } from "@/data/backtestData";
 import { useState } from "react";
 
@@ -50,6 +50,12 @@ const EquityCurveChart = () => {
           onMouseMove={handleMouseMove}
           onMouseLeave={() => setTooltipData(null)}
         >
+          <defs>
+            <linearGradient id="equityAreaGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#4fd1c5" stopOpacity={0.35} />
+              <stop offset="100%" stopColor="#4fd1c5" stopOpacity={0.02} />
+            </linearGradient>
+          </defs>
           <CartesianGrid 
             strokeDasharray="0"
             stroke="#1a2535"
@@ -76,6 +82,12 @@ const EquityCurveChart = () => {
             width={40}
           />
           <Tooltip content={() => null} cursor={false} />
+          <Area
+            type="monotone"
+            dataKey="equity"
+            stroke="none"
+            fill="url(#equityAreaGradient)"
+          />
           <Line
             type="monotone"
             dataKey="equity"
