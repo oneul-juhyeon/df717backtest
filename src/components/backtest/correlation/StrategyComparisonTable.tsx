@@ -12,15 +12,15 @@ const StrategyComparisonTable = () => {
                 <th className="text-left py-4 px-4 text-muted-foreground font-medium">METRIC</th>
                 <th className="text-center py-4 px-4 font-medium">
                   <span className="text-primary">● </span>
-                  <span className="text-muted-foreground">KARAT_KILLER (XAUUSD)</span>
+                  <span className="text-muted-foreground">Karat_Killer (XAUUSD)</span>
                 </th>
                 <th className="text-center py-4 px-4 font-medium">
                   <span className="text-warning">● </span>
-                  <span className="text-muted-foreground">MAD TURTLE (XAUUSD)</span>
+                  <span className="text-muted-foreground">Mad Turtle (XAUUSD)</span>
                 </th>
                 <th className="text-center py-4 px-4 font-medium">
                   <span className="text-success">● </span>
-                  <span className="text-muted-foreground">THE GOLD PHANTOM (XAUUSD)</span>
+                  <span className="text-muted-foreground">The Gold Phantom (XAUUSD)</span>
                 </th>
               </tr>
             </thead>

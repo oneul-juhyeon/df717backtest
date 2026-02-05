@@ -86,14 +86,14 @@ export const combinedEquityData = dfcovenantEquity.map((item, index) => ({
 // Correlation data
 export const correlationData = {
   pearson: [
-    ["DFcovenant", "1.00", "0.21", "0.26"],
-     ["DFtrust", "0.21", "1.00", "0.13"],
-     ["DFpath", "0.26", "0.13", "1.00"],
+    ["Karat_Killer", "1.00", "0.21", "0.26"],
+    ["Mad Turtle", "0.21", "1.00", "0.13"],
+    ["The Gold Phantom", "0.26", "0.13", "1.00"],
   ],
   spearman: [
-    ["DFcovenant", "1.00", "0.24", "0.22"],
-     ["DFtrust", "0.24", "1.00", "0.12"],
-     ["DFpath", "0.22", "0.12", "1.00"],
+    ["Karat_Killer", "1.00", "0.24", "0.22"],
+    ["Mad Turtle", "0.24", "1.00", "0.12"],
+    ["The Gold Phantom", "0.22", "0.12", "1.00"],
   ],
 };
 
@@ -101,11 +101,11 @@ export const correlationData = {
 export const strategyComparison = [
   { 
     metric: "EA Name", 
-    dfcovenant: "DFcovenant", 
-     dftrust: "DFtrust", 
-     dfpath: "DFpath" 
+    dfcovenant: "Karat_Killer", 
+    dftrust: "Mad Turtle", 
+    dfpath: "The Gold Phantom" 
   },
-   { metric: "Symbol", dfcovenant: "XAUUSD", dftrust: "XAUUSD", dfpath: "XAUUSD" },
+  { metric: "Symbol", dfcovenant: "XAUUSD", dftrust: "XAUUSD", dfpath: "XAUUSD" },
    { metric: "Period", dfcovenant: "2016-01-01 – 2026-01-28", dftrust: "2016-01-01 – 2026-02-03", dfpath: "2016-01-01 – 2026-02-03" },
    { metric: "Currency", dfcovenant: "EUR", dftrust: "EUR", dfpath: "EUR" },
    { metric: "Initial Deposit", dfcovenant: "€10,000.00", dftrust: "€10,000.00", dfpath: "€10,000.00" },
@@ -147,22 +147,22 @@ export const correlationScale = [
 
 // Win/Loss Synchronization matrix
 export const winLossSyncData = {
-  headers: ["KARAT_KILLER ...", "MAD TURTLE (X...", "THE GOLD PHAN..."],
+  headers: ["Karat_Killer", "Mad Turtle", "The Gold Phantom"],
   rows: [
-    ["Karat_Killer ...", "100%", "61%", "63%"],
-    ["Mad Turtle (X...", "61%", "100%", "57%"],
-    ["The Gold Phan...", "63%", "57%", "100%"],
+    ["Karat_Killer", "100%", "61%", "63%"],
+    ["Mad Turtle", "61%", "100%", "57%"],
+    ["The Gold Phantom", "63%", "57%", "100%"],
   ],
   average: "60%",
 };
 
 // Drawdown Overlap matrix
 export const drawdownOverlapData = {
-  headers: ["KARAT_KILLER ...", "MAD TURTLE (X...", "THE GOLD PHAN..."],
+  headers: ["Karat_Killer", "Mad Turtle", "The Gold Phantom"],
   rows: [
-    ["Karat_Killer ...", "100%", "24%", "18%"],
-    ["Mad Turtle (X...", "24%", "100%", "31%"],
-    ["The Gold Phan...", "18%", "31%", "100%"],
+    ["Karat_Killer", "100%", "24%", "18%"],
+    ["Mad Turtle", "24%", "100%", "31%"],
+    ["The Gold Phantom", "18%", "31%", "100%"],
   ],
   average: "24%",
 };
