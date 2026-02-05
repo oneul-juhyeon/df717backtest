@@ -145,6 +145,28 @@ export const correlationScale = [
   { label: "Strong Positive (0.5 to 1)", color: "bg-success/80" },
 ];
 
+// Win/Loss Synchronization matrix
+export const winLossSyncData = {
+  headers: ["KARAT_KILLER ...", "MAD TURTLE (X...", "THE GOLD PHAN..."],
+  rows: [
+    ["Karat_Killer ...", "100%", "61%", "63%"],
+    ["Mad Turtle (X...", "61%", "100%", "57%"],
+    ["The Gold Phan...", "63%", "57%", "100%"],
+  ],
+  average: "60%",
+};
+
+// Drawdown Overlap matrix
+export const drawdownOverlapData = {
+  headers: ["KARAT_KILLER ...", "MAD TURTLE (X...", "THE GOLD PHAN..."],
+  rows: [
+    ["Karat_Killer ...", "100%", "24%", "18%"],
+    ["Mad Turtle (X...", "24%", "100%", "31%"],
+    ["The Gold Phan...", "18%", "31%", "100%"],
+  ],
+  average: "24%",
+};
+
 // Drawdown comparison data
 export const drawdownComparisonData = [
    { date: "2016-01", dfcovenant: 0, dftrust: 0, dfpath: 0 },
