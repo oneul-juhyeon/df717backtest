@@ -1,6 +1,6 @@
 import { correlationData, correlationScale, winLossSyncData, drawdownOverlapData } from "@/data/correlationData";
 
-const strategyLabels = ["Karat_Killer", "Mad Turtle", "The Gold Phantom"];
+const strategyLabels = ["DFcovenant", "DFtrust", "DFpath"];
 const strategyColors = ["text-primary", "text-warning", "text-success"];
 
 const getCorrelationColor = (value: string) => {

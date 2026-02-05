@@ -86,14 +86,14 @@ export const combinedEquityData = dfcovenantEquity.map((item, index) => ({
 // Correlation data
 export const correlationData = {
   pearson: [
-    ["Karat_Killer", "1.00", "0.21", "0.26"],
-    ["Mad Turtle", "0.21", "1.00", "0.13"],
-    ["The Gold Phantom", "0.26", "0.13", "1.00"],
+    ["DFcovenant", "1.00", "0.21", "0.26"],
+    ["DFtrust", "0.21", "1.00", "0.13"],
+    ["DFpath", "0.26", "0.13", "1.00"],
   ],
   spearman: [
-    ["Karat_Killer", "1.00", "0.24", "0.22"],
-    ["Mad Turtle", "0.24", "1.00", "0.12"],
-    ["The Gold Phantom", "0.22", "0.12", "1.00"],
+    ["DFcovenant", "1.00", "0.24", "0.22"],
+    ["DFtrust", "0.24", "1.00", "0.12"],
+    ["DFpath", "0.22", "0.12", "1.00"],
   ],
 };
 
@@ -101,9 +101,9 @@ export const correlationData = {
 export const strategyComparison = [
   { 
     metric: "EA Name", 
-    dfcovenant: "Karat_Killer", 
-    dftrust: "Mad Turtle", 
-    dfpath: "The Gold Phantom" 
+    dfcovenant: "DFcovenant", 
+    dftrust: "DFtrust", 
+    dfpath: "DFpath" 
   },
   { metric: "Symbol", dfcovenant: "XAUUSD", dftrust: "XAUUSD", dfpath: "XAUUSD" },
    { metric: "Period", dfcovenant: "2016-01-01 – 2026-01-28", dftrust: "2016-01-01 – 2026-02-03", dfpath: "2016-01-01 – 2026-02-03" },
@@ -147,22 +147,22 @@ export const correlationScale = [
 
 // Win/Loss Synchronization matrix
 export const winLossSyncData = {
-  headers: ["Karat_Killer", "Mad Turtle", "The Gold Phantom"],
+  headers: ["DFcovenant", "DFtrust", "DFpath"],
   rows: [
-    ["Karat_Killer", "100%", "61%", "63%"],
-    ["Mad Turtle", "61%", "100%", "57%"],
-    ["The Gold Phantom", "63%", "57%", "100%"],
+    ["DFcovenant", "100%", "61%", "63%"],
+    ["DFtrust", "61%", "100%", "57%"],
+    ["DFpath", "63%", "57%", "100%"],
   ],
   average: "60%",
 };
 
 // Drawdown Overlap matrix
 export const drawdownOverlapData = {
-  headers: ["Karat_Killer", "Mad Turtle", "The Gold Phantom"],
+  headers: ["DFcovenant", "DFtrust", "DFpath"],
   rows: [
-    ["Karat_Killer", "100%", "24%", "18%"],
-    ["Mad Turtle", "24%", "100%", "31%"],
-    ["The Gold Phantom", "18%", "31%", "100%"],
+    ["DFcovenant", "100%", "24%", "18%"],
+    ["DFtrust", "24%", "100%", "31%"],
+    ["DFpath", "18%", "31%", "100%"],
   ],
   average: "24%",
 };
