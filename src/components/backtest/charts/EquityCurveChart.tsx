@@ -1,5 +1,6 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { equityCurveData } from "@/data/backtestData";
+import { useState } from "react";
 
 const formatCurrency = (value: number) => {
   return new Intl.NumberFormat('en-US', {
@@ -10,37 +11,36 @@ const formatCurrency = (value: number) => {
   }).format(value);
 };
 
-const CustomTooltip = ({ active, payload, coordinate, viewBox }: any) => {
-  if (active && payload && payload.length) {
-    const data = payload[0].payload;
-    const isLeftHalf = coordinate && viewBox && coordinate.x < viewBox.width / 2;
-    
-    return (
-      <div 
-        className="bg-[#0f1a24]/95 border border-[#1e2d3d] rounded px-3 py-2 shadow-lg backdrop-blur-sm"
-        style={{
-          transform: isLeftHalf ? 'translateX(10px) translateY(-50%)' : 'translateX(-100%) translateX(-10px) translateY(-50%)',
-        }}
-      >
-        <p className="text-xs text-foreground font-medium mb-1.5">{data.date}</p>
-        <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-sm bg-[#4fd1c5]" />
-          <span className="text-xs text-muted-foreground">DFcovenant:</span>
-          <span className="text-xs font-mono text-foreground">{formatCurrency(data.equity)}</span>
-        </div>
-      </div>
-    );
-  }
-  return null;
-};
-
 const EquityCurveChart = () => {
+  const [tooltipData, setTooltipData] = useState<{ x: number; y: number; date: string; equity: number; isLeftHalf: boolean } | null>(null);
+
+  const handleMouseMove = (state: any) => {
+    if (state.isTooltipActive && state.activePayload && state.activePayload.length > 0) {
+      const { chartX, chartY } = state;
+      const data = state.activePayload[0].payload;
+      const chartWidth = state.chartX !== undefined ? state.activeCoordinate?.x : 0;
+      const isLeftHalf = chartWidth < 400;
+      
+      setTooltipData({
+        x: state.activeCoordinate?.x || 0,
+        y: state.activeCoordinate?.y || 0,
+        date: data.date,
+        equity: data.equity,
+        isLeftHalf: (state.activeCoordinate?.x || 0) < 500
+      });
+    } else {
+      setTooltipData(null);
+    }
+  };
+
   return (
-    <div className="w-full h-[380px]">
+    <div className="w-full h-[380px] relative">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
           data={equityCurveData}
           margin={{ top: 10, right: 30, left: 10, bottom: 10 }}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={() => setTooltipData(null)}
         >
           <CartesianGrid 
             strokeDasharray="0"
@@ -67,13 +67,7 @@ const EquityCurveChart = () => {
             tick={{ fill: '#4a5568' }}
             width={40}
           />
-          <Tooltip 
-            content={<CustomTooltip />}
-            cursor={false}
-            offset={0}
-            position={{ y: 0 }}
-            allowEscapeViewBox={{ x: false, y: true }}
-          />
+          <Tooltip content={() => null} cursor={false} />
           <Line
             type="monotone"
             dataKey="equity"
@@ -90,6 +84,24 @@ const EquityCurveChart = () => {
           />
         </LineChart>
       </ResponsiveContainer>
+      
+      {tooltipData && (
+        <div 
+          className="absolute pointer-events-none bg-[#0f1a24]/95 border border-[#1e2d3d] rounded px-3 py-2 shadow-lg backdrop-blur-sm z-10"
+          style={{
+            left: tooltipData.isLeftHalf ? tooltipData.x + 60 : tooltipData.x - 100,
+            top: tooltipData.y + 10,
+            transform: 'translateY(-50%)',
+          }}
+        >
+          <p className="text-xs text-foreground font-medium mb-1.5">{tooltipData.date}</p>
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-sm bg-[#4fd1c5]" />
+            <span className="text-xs text-muted-foreground">DFcovenant:</span>
+            <span className="text-xs font-mono text-foreground">{formatCurrency(tooltipData.equity)}</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
