@@ -80,16 +80,16 @@ const MonthlyReturnsComparisonChart = () => {
             name="DFcovenant"
           />
           <Bar
-            dataKey="madTurtle"
+           dataKey="dftrust"
             fill="hsl(45 93% 47%)"
             radius={[2, 2, 0, 0]}
-            name="Mad Turtle"
+             name="DFtrust"
           />
           <Bar
-            dataKey="goldPhantom"
+           dataKey="dfpath"
             fill="hsl(142 70% 45%)"
             radius={[2, 2, 0, 0]}
-            name="Gold Phantom"
+             name="DFpath"
           />
         </BarChart>
       </ResponsiveContainer>
