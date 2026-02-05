@@ -39,7 +39,7 @@ const EquityCurveChart = () => {
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
           data={equityCurveData}
-          margin={{ top: 10, right: 30, left: 20, bottom: 10 }}
+          margin={{ top: 10, right: 30, left: 10, bottom: 10 }}
         >
           <CartesianGrid 
             strokeDasharray="0"
