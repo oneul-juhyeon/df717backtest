@@ -39,7 +39,7 @@ const HeroSection = () => {
         {/* Title */}
         <div className="text-center mb-6">
           <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-4">
-            <span className="text-gradient-primary text-primary">DF</span>
+             <span className="text-foreground">DF</span>
             <span className="text-foreground">covenant</span>
           </h1>
           <p className="text-lg text-white/60 max-w-2xl mx-auto font-light">
