@@ -10,6 +10,34 @@ const formatCurrency = (value: number) => {
   }).format(value);
 };
 
+const PulseDot = (props: any) => {
+  const { cx, cy } = props;
+  return (
+    <g>
+      <circle
+        cx={cx}
+        cy={cy}
+        r={4}
+        fill="#0a1018"
+        stroke="#4fd1c5"
+        strokeWidth={2}
+        className="animate-pulse"
+      />
+      <circle
+        cx={cx}
+        cy={cy}
+        r={8}
+        fill="transparent"
+        stroke="#4fd1c5"
+        strokeWidth={1}
+        opacity={0.4}
+        className="animate-ping"
+        style={{ transformOrigin: `${cx}px ${cy}px` }}
+      />
+    </g>
+  );
+};
+
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
@@ -64,7 +92,7 @@ const EquityCurveChart = () => {
             tickLine={false}
             axisLine={false}
             tick={{ fill: '#4a5568' }}
-            width={65}
+            width={20}
           />
           <Tooltip 
             content={<CustomTooltip />}
@@ -76,12 +104,7 @@ const EquityCurveChart = () => {
             stroke="#4fd1c5"
             strokeWidth={1.2}
             dot={false}
-            activeDot={{ 
-              r: 3, 
-              stroke: "#4fd1c5", 
-              strokeWidth: 1.5, 
-              fill: "#0a1018" 
-            }}
+            activeDot={<PulseDot />}
           />
         </LineChart>
       </ResponsiveContainer>
