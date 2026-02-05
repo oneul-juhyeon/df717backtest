@@ -19,12 +19,14 @@
  // Extract JavaScript variables from HTML content
  function extractJSVariables(html: string): {
    allDates: string[];
-   normalizedCurves: Record<string, number[]>;
+  normalizedCurves: number[][];
+  chartNames: string[];
    combinedEquity: number[];
  } | null {
    try {
      let allDates: string[] = [];
-     let normalizedCurves: Record<string, number[]> = {};
+    let normalizedCurves: number[][] = [];
+    let chartNames: string[] = [];
      let combinedEquity: number[] = [];
  
      // Look for allDates array - can span multiple lines, with var or const
@@ -37,117 +39,47 @@
        }
      }
      
-     // Look for normalizedCurves object - complex multi-line format, greedy match
-     const curvesMatch = html.match(/(?:const|var|let)\s+normalizedCurves\s*=\s*\{([\s\S]*?)\n\s*\};/);
+    // Look for chartNames array - maps index to strategy name
+    const chartNamesMatch = html.match(/(?:const|var|let)\s+chartNames\s*=\s*\[([\s\S]*?)\];/);
+    if (chartNamesMatch) {
+      const nameMatches = chartNamesMatch[1].match(/["']([^"']+)["']/g);
+      if (nameMatches) {
+        chartNames = nameMatches.map(n => n.replace(/["']/g, ''));
+      }
+    }
+    console.log('[useCorrelationData] Extracted chartNames:', chartNames);
+    
+    // Look for normalizedCurves as 2D array: [[...], [...], [...]]
+    const curvesMatch = html.match(/(?:const|var|let)\s+normalizedCurves\s*=\s*\[([\s\S]*?)\];(?=\s*(?:const|var|let|function|\/\/|$))/);
      if (curvesMatch) {
-       const curvesContent = curvesMatch[1];
-       // Match each strategy: "StrategyName": [numbers...]
-       const strategyPattern = /["']?([A-Za-z]\w*)["']?\s*:\s*\[([\d.,\s\n-]+)\]/g;
-       let match;
-       while ((match = strategyPattern.exec(curvesContent)) !== null) {
-         const strategyName = match[1];
-         const valuesStr = match[2].replace(/\s+/g, '');
-         const values = valuesStr.split(',').filter(v => v).map(v => parseFloat(v));
-         if (values.length > 0) {
-           normalizedCurves[strategyName] = values;
+      // Parse as array of arrays
+      const content = curvesMatch[1];
+      // Match each inner array: [numbers...]
+      const innerArrayPattern = /\[([\d.,\s\n-]+)\]/g;
+      let innerMatch;
+      while ((innerMatch = innerArrayPattern.exec(content)) !== null) {
+        const valuesStr = innerMatch[1].replace(/\s+/g, '');
+        const values = valuesStr.split(',').filter(v => v && !isNaN(parseFloat(v))).map(v => parseFloat(v));
+        if (values.length > 0) {
+          normalizedCurves.push(values);
          }
        }
      }
-     
-      // Log extracted strategy names for debugging
-      console.log('[useCorrelationData] Extracted normalizedCurves keys:', Object.keys(normalizedCurves));
-      console.log('[useCorrelationData] Sample values - first strategy:', Object.values(normalizedCurves)[0]?.slice(0, 5));
-      
+    console.log('[useCorrelationData] Extracted normalizedCurves:', normalizedCurves.length, 'series');
+    normalizedCurves.forEach((series, i) => {
+      console.log(`[useCorrelationData] Series ${i} (${chartNames[i] || 'unknown'}): ${series.length} points, first 3:`, series.slice(0, 3));
+    });
+
      // Look for combinedEquity array
      const combinedMatch = html.match(/(?:const|var|let)\s+combinedEquity\s*=\s*\[([\d.,\s\n-]+)\];/);
      if (combinedMatch) {
        const valuesStr = combinedMatch[1].replace(/\s+/g, '');
        combinedEquity = valuesStr.split(',').filter(v => v).map(v => parseFloat(v));
      }
+    console.log('[useCorrelationData] Extracted combinedEquity:', combinedEquity.length, 'points');
  
-     // If no allDates found, try alternative patterns
-     if (allDates.length === 0 || Object.keys(normalizedCurves).length === 0) {
-       // Try finding in inline scripts more aggressively
-       const scriptBlocks = html.match(/<script[^>]*>([\s\S]*?)<\/script>/gi) || [];
-       
-       for (const block of scriptBlocks) {
-         const content = block.replace(/<\/?script[^>]*>/gi, '');
-         
-         // Look for allDates if not found yet
-         if (allDates.length === 0) {
-           const altDatesMatch = content.match(/allDates\s*=\s*\[([\s\S]*?)\];/);
-           if (altDatesMatch) {
-             const dateMatches = altDatesMatch[1].match(/["']([^"']+)["']/g);
-             if (dateMatches) {
-               allDates = dateMatches.map(d => d.replace(/["']/g, ''));
-             }
-           }
-         }
-         
-         // Look for normalizedCurves if not found yet
-         if (Object.keys(normalizedCurves).length === 0) {
-           const altCurvesMatch = content.match(/normalizedCurves\s*=\s*\{([\s\S]*?)\n\s*\};/);
-           if (altCurvesMatch) {
-             const strategyPattern = /["']?([A-Za-z]\w*)["']?\s*:\s*\[([\d.,\s\n-]+)\]/g;
-             let match;
-             while ((match = strategyPattern.exec(altCurvesMatch[1])) !== null) {
-               const values = match[2].replace(/\s+/g, '').split(',').filter(v => v).map(v => parseFloat(v));
-               if (values.length > 0) {
-                 normalizedCurves[match[1]] = values;
-               }
-             }
-           }
-         }
-         
-         // Look for combinedEquity if not found yet
-         if (combinedEquity.length === 0) {
-           const altCombinedMatch = content.match(/combinedEquity\s*=\s*\[([\d.,\s\n-]+)\];/);
-           if (altCombinedMatch) {
-             combinedEquity = altCombinedMatch[1].replace(/\s+/g, '').split(',').filter(v => v).map(v => parseFloat(v));
-           }
-         }
-       }
-     }
- 
-     // If still no allDates/normalizedCurves found, try to extract Chart.js data as fallback
-     if (allDates.length === 0 && Object.keys(normalizedCurves).length === 0) {
-       // Look for labels array in Chart.js format
-       const labelsMatch = html.match(/labels\s*:\s*\[([\s\S]*?)\]/);
-       if (labelsMatch) {
-         const labelMatches = labelsMatch[1].match(/["']([^"']+)["']/g);
-         if (labelMatches) {
-           allDates = labelMatches.map(d => d.replace(/["']/g, ''));
-         }
-       }
-       
-       // Look for Balance data in Chart.js datasets format
-       const balanceMatch = html.match(/label\s*:\s*['"]Balance['"][\s\S]*?data\s*:\s*\[([\d.,\s\n]+)\]/);
-       if (balanceMatch) {
-         const valuesStr = balanceMatch[1].replace(/\s+/g, '');
-         const values = valuesStr.split(',').filter(v => v).map(v => parseFloat(v));
-         normalizedCurves['DFcovenant'] = values;
-         combinedEquity = values;
-       }
-       
-       // Look for Equity data too
-       const equityMatch = html.match(/label\s*:\s*['"]Equity['"][\s\S]*?data\s*:\s*\[([\d.,\s\n]+)\]/);
-       if (equityMatch) {
-         const valuesStr = equityMatch[1].replace(/\s+/g, '');
-         const values = valuesStr.split(',').filter(v => v).map(v => parseFloat(v));
-         // Use Equity data as additional strategy
-         normalizedCurves['Equity'] = values;
-       }
-     }
- 
-     if (allDates.length > 0 && Object.keys(normalizedCurves).length > 0) {
-       return { allDates, normalizedCurves, combinedEquity };
-     }
-     
-     // If we have curve data but no dates, generate index-based dates
-     if (Object.keys(normalizedCurves).length > 0) {
-       const curveLength = Object.values(normalizedCurves)[0].length;
-       allDates = Array.from({ length: curveLength }, (_, i) => `Day ${i + 1}`);
-       return { allDates, normalizedCurves, combinedEquity };
+    if (allDates.length > 0 && normalizedCurves.length > 0) {
+      return { allDates, normalizedCurves, chartNames, combinedEquity };
      }
      
      return null;
@@ -189,14 +121,25 @@
          const blob = await response.blob();
          const zip = await JSZip.loadAsync(blob);
          
-         // Find HTML file in the ZIP
+        // Find correlation report HTML file in the ZIP (prioritize files with "correlation" in name)
          let htmlContent = '';
          for (const [filename, file] of Object.entries(zip.files)) {
-           if (filename.endsWith('.html') && !file.dir) {
+          if (filename.toLowerCase().includes('correlation') && filename.endsWith('.html') && !file.dir) {
              htmlContent = await file.async('text');
+            console.log('[useCorrelationData] Found correlation report:', filename);
              break;
            }
          }
+        // Fallback to any HTML file if no correlation-specific one found
+        if (!htmlContent) {
+          for (const [filename, file] of Object.entries(zip.files)) {
+            if (filename.endsWith('.html') && !file.dir) {
+              htmlContent = await file.async('text');
+              console.log('[useCorrelationData] Using HTML file:', filename);
+              break;
+            }
+          }
+        }
          
          if (!htmlContent) {
            // Fall back to static data
@@ -232,17 +175,51 @@
            return;
          }
          
-         const { allDates, normalizedCurves, combinedEquity } = extracted;
+        const { allDates, normalizedCurves, chartNames, combinedEquity } = extracted;
+        
+        // Map chartNames index to our strategy keys
+        // chartNames = ["Karat_Killer (XAUUSD)", "Mad Turtle (XAUUSD)", "The Gold Phantom (XAUUSD)"]
+        // Index 0 → DFcovenant (Karat Killer)
+        // Index 1 → DFtrust (Mad Turtle)
+        // Index 2 → DFpath (Gold Phantom)
+        const strategyMapping: { key: 'dfcovenant' | 'dftrust' | 'dfpath'; patterns: string[] }[] = [
+          { key: 'dfcovenant', patterns: ['karat', 'killer', 'covenant'] },
+          { key: 'dftrust', patterns: ['turtle', 'mad', 'trust'] },
+          { key: 'dfpath', patterns: ['phantom', 'gold', 'path'] },
+        ];
+        
+        // Build index map from chartNames
+        const indexMap: Record<'dfcovenant' | 'dftrust' | 'dfpath', number> = {
+          dfcovenant: 0,
+          dftrust: 1,
+          dfpath: 2,
+        };
+        
+        // Try to match chartNames to our strategies
+        chartNames.forEach((name, idx) => {
+          const lowerName = name.toLowerCase();
+          for (const mapping of strategyMapping) {
+            if (mapping.patterns.some(p => lowerName.includes(p))) {
+              indexMap[mapping.key] = idx;
+              break;
+            }
+          }
+        });
+        
+        console.log('[useCorrelationData] Strategy index mapping:', indexMap);
          
          // Map the data to our format
          const dailyEquityData: DailyEquityPoint[] = allDates.map((date, i) => ({
            date,
-           dfcovenant: normalizedCurves['DFcovenant']?.[i] || normalizedCurves['dfcovenant']?.[i] || 0,
-           dftrust: normalizedCurves['DFtrust']?.[i] || normalizedCurves['dftrust']?.[i] || 0,
-           dfpath: normalizedCurves['DFpath']?.[i] || normalizedCurves['dfpath']?.[i] || 0,
+          dfcovenant: normalizedCurves[indexMap.dfcovenant]?.[i] ?? 0,
+          dftrust: normalizedCurves[indexMap.dftrust]?.[i] ?? 0,
+          dfpath: normalizedCurves[indexMap.dfpath]?.[i] ?? 0,
            combined: combinedEquity[i] || 0,
          }));
          
+        console.log('[useCorrelationData] Sample daily data point:', dailyEquityData[0]);
+        console.log('[useCorrelationData] Total data points:', dailyEquityData.length);
+        
          setState({
            loading: false,
            error: null,
