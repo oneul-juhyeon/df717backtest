@@ -3,23 +3,28 @@ import DiversificationMetrics from "@/components/backtest/correlation/Diversific
 import StrategyComparisonTable from "@/components/backtest/correlation/StrategyComparisonTable";
 import CorrelationMatrices from "@/components/backtest/correlation/CorrelationMatrices";
 import EquityComparisonCharts from "@/components/backtest/correlation/EquityComparisonCharts";
-
 const CorrelationReport = () => {
-  return (
-    <div className="min-h-screen bg-background text-foreground">
+  return <div className="min-h-screen bg-background text-foreground">
       <Header />
 
       {/* Hero Section */}
       <section className="py-8 border-b border-white/10 text-center">
         <div className="container mx-auto px-6">
-          <h1 className="text-2xl md:text-3xl font-bold mb-2 text-primary">
-            BLODSALGO
-          </h1>
+          <h1 className="text-2xl md:text-3xl font-bold mb-2 text-primary">DF717</h1>
           <h2 className="text-xl md:text-2xl font-semibold mb-2">
             Strategy Correlation Report
           </h2>
           <p className="text-muted-foreground text-sm">
-            Generated: {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'numeric', day: 'numeric' })}, {new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}
+            Generated: {new Date().toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'numeric',
+            day: 'numeric'
+          })}, {new Date().toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+          })}
           </p>
         </div>
       </section>
@@ -51,8 +56,6 @@ const CorrelationReport = () => {
           </p>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 };
-
 export default CorrelationReport;
