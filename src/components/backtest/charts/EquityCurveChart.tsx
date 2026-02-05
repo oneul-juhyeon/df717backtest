@@ -12,22 +12,29 @@ const formatCurrency = (value: number) => {
 };
 
 const EquityCurveChart = () => {
-  const [tooltipData, setTooltipData] = useState<{ x: number; y: number; date: string; equity: number; isLeftHalf: boolean; chartWidth: number } | null>(null);
+  const [tooltipData, setTooltipData] = useState<{
+    x: number;
+    y: number;
+    date: string;
+    equity: number;
+    chartWidth: number;
+    chartHeight: number;
+  } | null>(null);
 
   const handleMouseMove = (state: any) => {
     if (state.isTooltipActive && state.activePayload && state.activePayload.length > 0) {
       const data = state.activePayload[0].payload;
       const xCoord = state.activeCoordinate?.x || 0;
       const chartWidth = state.chartWidth || 1000;
-      const isLeftHalf = xCoord < chartWidth / 2;
+      const chartHeight = state.chartHeight || 380;
       
       setTooltipData({
         x: xCoord,
         y: state.activeCoordinate?.y || 0,
         date: data.date,
         equity: data.equity,
-        isLeftHalf,
-        chartWidth
+        chartWidth,
+        chartHeight,
       });
     } else {
       setTooltipData(null);
@@ -86,17 +93,38 @@ const EquityCurveChart = () => {
         </LineChart>
       </ResponsiveContainer>
       
-      {tooltipData && (
+      {tooltipData && (() => {
+        const TOOLTIP_W = 220;
+        const TOOLTIP_H = 64;
+        const PADDING = 8;
+        const OFFSET_X = 14;
+        const OFFSET_Y = 12;
+
+        let sideRight = tooltipData.x < tooltipData.chartWidth / 2;
+        if (sideRight && tooltipData.x + OFFSET_X + TOOLTIP_W > tooltipData.chartWidth - PADDING) {
+          sideRight = false;
+        }
+        if (!sideRight && tooltipData.x - OFFSET_X - TOOLTIP_W < PADDING) {
+          sideRight = true;
+        }
+
+        let top = tooltipData.y + OFFSET_Y;
+        if (top + TOOLTIP_H > tooltipData.chartHeight - PADDING) {
+          top = tooltipData.y - OFFSET_Y - TOOLTIP_H;
+        }
+
+        const left = sideRight ? tooltipData.x + OFFSET_X : tooltipData.x - OFFSET_X;
+        const transform = sideRight ? 'translateY(0)' : 'translateX(-100%) translateY(0)';
+
+        return (
         <div 
           className="absolute pointer-events-none bg-[#0f1a24]/95 border border-[#1e2d3d] rounded px-3 py-2 shadow-lg backdrop-blur-sm z-10"
           style={{
-            left: tooltipData.isLeftHalf 
-              ? tooltipData.x + 65
-              : tooltipData.x + 25,
-            top: tooltipData.y + 10,
-            transform: tooltipData.isLeftHalf 
-              ? 'translateY(-100%)' 
-              : 'translateX(-100%) translateY(-100%)',
+            left,
+            top,
+            transform,
+            width: TOOLTIP_W,
+            transition: 'left 70ms linear, top 70ms linear',
           }}
         >
           <p className="text-xs text-foreground font-medium mb-1.5">{tooltipData.date}</p>
@@ -106,7 +134,8 @@ const EquityCurveChart = () => {
             <span className="text-xs font-mono text-foreground">{formatCurrency(tooltipData.equity)}</span>
           </div>
         </div>
-      )}
+        );
+      })()}
     </div>
   );
 };
