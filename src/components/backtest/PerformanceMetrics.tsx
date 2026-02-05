@@ -53,15 +53,11 @@ const PerformanceMetrics = () => {
       </div>
 
       {/* Equity curve with interactive chart */}
-      <div className="chart-container">
-        <div className="flex items-center justify-between mb-4">
-          <p className="text-sm text-muted-foreground">
-            Equity Curve in EUR (2016-2026) — €10,000 → €732,988
-          </p>
-        </div>
-        <div className="bg-card/50 rounded-lg p-4 border border-border">
+      <div className="bg-[#0a1018] rounded-xl p-6 border border-[#1a2535]">
+        <h3 className="text-muted-foreground text-sm mb-4">
+          Equity Curve in EUR (2016-2026) — €10,000 → €732,988
+        </h3>
           <EquityCurveChart />
-        </div>
       </div>
 
       {/* View full report link */}

@@ -28,14 +28,8 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 const EquityCurveChart = () => {
-  const startEquity = equityCurveData[0]?.equity || 10000;
-  const endEquity = equityCurveData[equityCurveData.length - 1]?.equity || 10000;
-  
   return (
-    <div className="w-full h-[420px] bg-[#0a1018] rounded-xl p-6">
-      <h3 className="text-muted-foreground text-sm mb-6">
-        Equity Curve in EUR (2016-2026) — {formatCurrency(startEquity)} → {formatCurrency(endEquity)}
-      </h3>
+    <div className="w-full h-[380px]">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
           data={equityCurveData}
@@ -74,7 +68,7 @@ const EquityCurveChart = () => {
             type="monotone"
             dataKey="equity"
             stroke="#4fd1c5"
-            strokeWidth={1.2}
+            strokeWidth={2.4}
             dot={false}
             activeDot={{
               r: 5,
