@@ -27,8 +27,8 @@
      let normalizedCurves: Record<string, number[]> = {};
      let combinedEquity: number[] = [];
  
-     // Look for allDates array - can span multiple lines
-     const datesMatch = html.match(/const\s+allDates\s*=\s*\[([\s\S]*?)\];/);
+     // Look for allDates array - can span multiple lines, with var or const
+     const datesMatch = html.match(/(?:const|var|let)\s+allDates\s*=\s*\[([\s\S]*?)\];/);
      if (datesMatch) {
        // Extract all quoted strings from the array
        const dateMatches = datesMatch[1].match(/["']([^"']+)["']/g);
@@ -37,30 +37,76 @@
        }
      }
      
-     // Look for normalizedCurves object - complex multi-line format
-     const curvesMatch = html.match(/const\s+normalizedCurves\s*=\s*\{([\s\S]*?)\};/);
+     // Look for normalizedCurves object - complex multi-line format, greedy match
+     const curvesMatch = html.match(/(?:const|var|let)\s+normalizedCurves\s*=\s*\{([\s\S]*?)\n\s*\};/);
      if (curvesMatch) {
        const curvesContent = curvesMatch[1];
        // Match each strategy: "StrategyName": [numbers...]
-       const strategyPattern = /["']?(\w+)["']?\s*:\s*\[([\d.,\s\n]+)\]/g;
+       const strategyPattern = /["']?([A-Za-z]\w*)["']?\s*:\s*\[([\d.,\s\n-]+)\]/g;
        let match;
        while ((match = strategyPattern.exec(curvesContent)) !== null) {
          const strategyName = match[1];
          const valuesStr = match[2].replace(/\s+/g, '');
          const values = valuesStr.split(',').filter(v => v).map(v => parseFloat(v));
-         normalizedCurves[strategyName] = values;
+         if (values.length > 0) {
+           normalizedCurves[strategyName] = values;
+         }
        }
      }
      
      // Look for combinedEquity array
-     const combinedMatch = html.match(/const\s+combinedEquity\s*=\s*\[([\d.,\s\n]+)\];/);
+     const combinedMatch = html.match(/(?:const|var|let)\s+combinedEquity\s*=\s*\[([\d.,\s\n-]+)\];/);
      if (combinedMatch) {
        const valuesStr = combinedMatch[1].replace(/\s+/g, '');
        combinedEquity = valuesStr.split(',').filter(v => v).map(v => parseFloat(v));
      }
  
-     // If no allDates/normalizedCurves found, try to extract Chart.js data
-     if (allDates.length === 0) {
+     // If no allDates found, try alternative patterns
+     if (allDates.length === 0 || Object.keys(normalizedCurves).length === 0) {
+       // Try finding in inline scripts more aggressively
+       const scriptBlocks = html.match(/<script[^>]*>([\s\S]*?)<\/script>/gi) || [];
+       
+       for (const block of scriptBlocks) {
+         const content = block.replace(/<\/?script[^>]*>/gi, '');
+         
+         // Look for allDates if not found yet
+         if (allDates.length === 0) {
+           const altDatesMatch = content.match(/allDates\s*=\s*\[([\s\S]*?)\];/);
+           if (altDatesMatch) {
+             const dateMatches = altDatesMatch[1].match(/["']([^"']+)["']/g);
+             if (dateMatches) {
+               allDates = dateMatches.map(d => d.replace(/["']/g, ''));
+             }
+           }
+         }
+         
+         // Look for normalizedCurves if not found yet
+         if (Object.keys(normalizedCurves).length === 0) {
+           const altCurvesMatch = content.match(/normalizedCurves\s*=\s*\{([\s\S]*?)\n\s*\};/);
+           if (altCurvesMatch) {
+             const strategyPattern = /["']?([A-Za-z]\w*)["']?\s*:\s*\[([\d.,\s\n-]+)\]/g;
+             let match;
+             while ((match = strategyPattern.exec(altCurvesMatch[1])) !== null) {
+               const values = match[2].replace(/\s+/g, '').split(',').filter(v => v).map(v => parseFloat(v));
+               if (values.length > 0) {
+                 normalizedCurves[match[1]] = values;
+               }
+             }
+           }
+         }
+         
+         // Look for combinedEquity if not found yet
+         if (combinedEquity.length === 0) {
+           const altCombinedMatch = content.match(/combinedEquity\s*=\s*\[([\d.,\s\n-]+)\];/);
+           if (altCombinedMatch) {
+             combinedEquity = altCombinedMatch[1].replace(/\s+/g, '').split(',').filter(v => v).map(v => parseFloat(v));
+           }
+         }
+       }
+     }
+ 
+     // If still no allDates/normalizedCurves found, try to extract Chart.js data as fallback
+     if (allDates.length === 0 && Object.keys(normalizedCurves).length === 0) {
        // Look for labels array in Chart.js format
        const labelsMatch = html.match(/labels\s*:\s*\[([\s\S]*?)\]/);
        if (labelsMatch) {
