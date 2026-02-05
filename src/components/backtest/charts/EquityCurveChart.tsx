@@ -89,9 +89,9 @@ const EquityCurveChart = () => {
         <div 
           className="absolute pointer-events-none bg-[#0f1a24]/95 border border-[#1e2d3d] rounded px-3 py-2 shadow-lg backdrop-blur-sm z-10"
           style={{
-            left: tooltipData.isLeftHalf ? tooltipData.x + 60 : tooltipData.x - 100,
-            top: tooltipData.y + 10,
-            transform: 'translateY(-50%)',
+            left: tooltipData.x + 50,
+            top: tooltipData.y + 20,
+            transform: 'translateX(-50%)',
           }}
         >
           <p className="text-xs text-foreground font-medium mb-1.5">{tooltipData.date}</p>
