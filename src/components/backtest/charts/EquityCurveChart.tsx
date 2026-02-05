@@ -10,11 +10,18 @@ const formatCurrency = (value: number) => {
   }).format(value);
 };
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({ active, payload, coordinate, viewBox }: any) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
+    const isLeftHalf = coordinate && viewBox && coordinate.x < viewBox.width / 2;
+    
     return (
-      <div className="bg-[#0f1a24]/95 border border-[#1e2d3d] rounded px-3 py-2 shadow-lg backdrop-blur-sm">
+      <div 
+        className="bg-[#0f1a24]/95 border border-[#1e2d3d] rounded px-3 py-2 shadow-lg backdrop-blur-sm"
+        style={{
+          transform: isLeftHalf ? 'translateX(15px)' : 'translateX(-100%) translateX(-15px)',
+        }}
+      >
         <p className="text-xs text-foreground font-medium mb-1.5">{data.date}</p>
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-sm bg-[#4fd1c5]" />
