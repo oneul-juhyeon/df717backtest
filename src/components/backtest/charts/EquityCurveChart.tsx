@@ -64,7 +64,7 @@ const EquityCurveChart = () => {
             tickLine={false}
             axisLine={false}
             tick={{ fill: '#4a5568' }}
-            width={35}
+            width={40}
           />
           <Tooltip 
             content={<CustomTooltip />}
@@ -77,10 +77,10 @@ const EquityCurveChart = () => {
             strokeWidth={1.2}
             dot={false}
             activeDot={{
-              r: 4,
-              fill: "#0a1018",
+              r: 5,
+              fill: "transparent",
               stroke: "#4fd1c5",
-              strokeWidth: 2,
+              strokeWidth: 1.5,
               className: "animate-scale-in"
             }}
           />
