@@ -19,7 +19,7 @@ const CustomTooltip = ({ active, payload, coordinate, viewBox }: any) => {
       <div 
         className="bg-[#0f1a24]/95 border border-[#1e2d3d] rounded px-3 py-2 shadow-lg backdrop-blur-sm"
         style={{
-          transform: isLeftHalf ? 'translateX(15px)' : 'translateX(-100%) translateX(-15px)',
+          transform: isLeftHalf ? 'translateX(10px) translateY(-50%)' : 'translateX(-100%) translateX(-10px) translateY(-50%)',
         }}
       >
         <p className="text-xs text-foreground font-medium mb-1.5">{data.date}</p>
@@ -70,6 +70,9 @@ const EquityCurveChart = () => {
           <Tooltip 
             content={<CustomTooltip />}
             cursor={false}
+            offset={0}
+            position={{ y: 0 }}
+            allowEscapeViewBox={{ x: false, y: true }}
           />
           <Line
             type="monotone"
