@@ -1,5 +1,6 @@
  import { useState, useEffect } from 'react';
  import JSZip from 'jszip';
+ import { combinedEquityData as staticEquityData } from '@/data/correlationData';
  
  export interface DailyEquityPoint {
    date: string;
@@ -58,15 +59,44 @@
        combinedEquity = valuesStr.split(',').filter(v => v).map(v => parseFloat(v));
      }
  
-     console.log('Extracted data:', {
-       datesCount: allDates.length,
-       curves: Object.keys(normalizedCurves),
-       curveLengths: Object.entries(normalizedCurves).map(([k,v]) => `${k}:${v.length}`),
-       combinedLength: combinedEquity.length,
-       sampleDates: allDates.slice(0, 5),
-     });
+     // If no allDates/normalizedCurves found, try to extract Chart.js data
+     if (allDates.length === 0) {
+       // Look for labels array in Chart.js format
+       const labelsMatch = html.match(/labels\s*:\s*\[([\s\S]*?)\]/);
+       if (labelsMatch) {
+         const labelMatches = labelsMatch[1].match(/["']([^"']+)["']/g);
+         if (labelMatches) {
+           allDates = labelMatches.map(d => d.replace(/["']/g, ''));
+         }
+       }
+       
+       // Look for Balance data in Chart.js datasets format
+       const balanceMatch = html.match(/label\s*:\s*['"]Balance['"][\s\S]*?data\s*:\s*\[([\d.,\s\n]+)\]/);
+       if (balanceMatch) {
+         const valuesStr = balanceMatch[1].replace(/\s+/g, '');
+         const values = valuesStr.split(',').filter(v => v).map(v => parseFloat(v));
+         normalizedCurves['DFcovenant'] = values;
+         combinedEquity = values;
+       }
+       
+       // Look for Equity data too
+       const equityMatch = html.match(/label\s*:\s*['"]Equity['"][\s\S]*?data\s*:\s*\[([\d.,\s\n]+)\]/);
+       if (equityMatch) {
+         const valuesStr = equityMatch[1].replace(/\s+/g, '');
+         const values = valuesStr.split(',').filter(v => v).map(v => parseFloat(v));
+         // Use Equity data as additional strategy
+         normalizedCurves['Equity'] = values;
+       }
+     }
  
      if (allDates.length > 0 && Object.keys(normalizedCurves).length > 0) {
+       return { allDates, normalizedCurves, combinedEquity };
+     }
+     
+     // If we have curve data but no dates, generate index-based dates
+     if (Object.keys(normalizedCurves).length > 0) {
+       const curveLength = Object.values(normalizedCurves)[0].length;
+       allDates = Array.from({ length: curveLength }, (_, i) => `Day ${i + 1}`);
        return { allDates, normalizedCurves, combinedEquity };
      }
      
@@ -90,7 +120,20 @@
          // Fetch the ZIP file
          const response = await fetch('/correlation-data-2.zip');
          if (!response.ok) {
-           throw new Error('Failed to fetch correlation data ZIP');
+           // Fall back to static data if ZIP is not available
+           console.log('ZIP not available, using static data');
+           setState({
+             loading: false,
+             error: null,
+             dailyEquityData: staticEquityData.map(d => ({
+               date: d.date,
+               dfcovenant: d.dfcovenant,
+               dftrust: d.dftrust,
+               dfpath: d.dfpath,
+               combined: d.combined,
+             })),
+           });
+           return;
          }
          
          const blob = await response.blob();
@@ -101,38 +144,42 @@
          for (const [filename, file] of Object.entries(zip.files)) {
            if (filename.endsWith('.html') && !file.dir) {
              htmlContent = await file.async('text');
-         console.log('HTML file found:', filename, 'length:', htmlContent.length);
-         console.log('HTML preview (first 2000 chars):', htmlContent.substring(0, 2000));
              break;
            }
          }
          
          if (!htmlContent) {
-           throw new Error('No HTML file found in ZIP');
+           // Fall back to static data
+           setState({
+             loading: false,
+             error: null,
+             dailyEquityData: staticEquityData.map(d => ({
+               date: d.date,
+               dfcovenant: d.dfcovenant,
+               dftrust: d.dftrust,
+               dfpath: d.dfpath,
+               combined: d.combined,
+             })),
+           });
+           return;
          }
          
-     // Also log a sample around "allDates" if it exists
-     const allDatesIndex = htmlContent.indexOf('allDates');
-     if (allDatesIndex !== -1) {
-       console.log('Found allDates at index:', allDatesIndex);
-       console.log('Context around allDates:', htmlContent.substring(allDatesIndex, allDatesIndex + 500));
-     } else {
-       console.log('allDates not found in HTML');
-       // Try to find other common data variable names
-       const possibleVars = ['equityData', 'chartData', 'dates', 'equity', 'const data'];
-       for (const varName of possibleVars) {
-         const idx = htmlContent.indexOf(varName);
-         if (idx !== -1) {
-           console.log(`Found "${varName}" at index:`, idx);
-           console.log(`Context:`, htmlContent.substring(idx, idx + 300));
-         }
-       }
-     }
- 
          // Extract the JavaScript variables
          const extracted = extractJSVariables(htmlContent);
          if (!extracted) {
-           throw new Error('Could not extract data from HTML');
+           // Fall back to static data
+           setState({
+             loading: false,
+             error: null,
+             dailyEquityData: staticEquityData.map(d => ({
+               date: d.date,
+               dfcovenant: d.dfcovenant,
+               dftrust: d.dftrust,
+               dfpath: d.dfpath,
+               combined: d.combined,
+             })),
+           });
+           return;
          }
          
          const { allDates, normalizedCurves, combinedEquity } = extracted;
