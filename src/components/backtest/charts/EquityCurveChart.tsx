@@ -64,7 +64,7 @@ const EquityCurveChart = () => {
             tickLine={false}
             axisLine={false}
             tick={{ fill: '#4a5568' }}
-            width={80}
+            width={65}
           />
           <Tooltip 
             content={<CustomTooltip />}
