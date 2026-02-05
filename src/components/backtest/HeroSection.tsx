@@ -2,7 +2,7 @@ import { TrendingUp, Activity, ShieldCheck, BarChart3, Sparkles } from "lucide-r
 const metrics = [{
   value: "€722,988",
   label: "NET PROFIT",
-  color: "text-warning"
+   color: "text-foreground"
 }, {
   value: "3.31",
   label: "PROFIT FACTOR",
