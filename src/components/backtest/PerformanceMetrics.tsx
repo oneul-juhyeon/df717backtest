@@ -1,4 +1,4 @@
-import { TrendingUp, ExternalLink } from "lucide-react";
+import { TrendingUp, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import MetricCard from "./MetricCard";
 import EquityCurveChart from "./charts/EquityCurveChart";
@@ -61,13 +61,15 @@ const PerformanceMetrics = () => {
       </div>
 
       {/* View full report link */}
-      <Link 
-        to="/backtest-report"
-        className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors text-sm"
-      >
-        <ExternalLink className="w-4 h-4" />
-        View Full Backtest Report
-      </Link>
+      <div className="flex justify-center pt-4">
+        <Link 
+          to="/backtest-report"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-primary/10 border border-primary/30 rounded-lg text-primary hover:bg-primary/20 transition-colors"
+        >
+          View Full Backtest Report
+          <ArrowRight className="w-4 h-4" />
+        </Link>
+      </div>
     </div>
   );
 };
