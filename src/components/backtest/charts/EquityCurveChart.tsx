@@ -12,21 +12,22 @@ const formatCurrency = (value: number) => {
 };
 
 const EquityCurveChart = () => {
-  const [tooltipData, setTooltipData] = useState<{ x: number; y: number; date: string; equity: number; isLeftHalf: boolean } | null>(null);
+  const [tooltipData, setTooltipData] = useState<{ x: number; y: number; date: string; equity: number; isLeftHalf: boolean; chartWidth: number } | null>(null);
 
   const handleMouseMove = (state: any) => {
     if (state.isTooltipActive && state.activePayload && state.activePayload.length > 0) {
-      const { chartX, chartY } = state;
       const data = state.activePayload[0].payload;
-      const chartWidth = state.chartX !== undefined ? state.activeCoordinate?.x : 0;
-      const isLeftHalf = chartWidth < 400;
+      const xCoord = state.activeCoordinate?.x || 0;
+      const chartWidth = state.chartWidth || 1000;
+      const isLeftHalf = xCoord < chartWidth / 2;
       
       setTooltipData({
-        x: state.activeCoordinate?.x || 0,
+        x: xCoord,
         y: state.activeCoordinate?.y || 0,
         date: data.date,
         equity: data.equity,
-        isLeftHalf: (state.activeCoordinate?.x || 0) < 500
+        isLeftHalf,
+        chartWidth
       });
     } else {
       setTooltipData(null);
@@ -89,9 +90,13 @@ const EquityCurveChart = () => {
         <div 
           className="absolute pointer-events-none bg-[#0f1a24]/95 border border-[#1e2d3d] rounded px-3 py-2 shadow-lg backdrop-blur-sm z-10"
           style={{
-            left: tooltipData.x + 50,
+            left: tooltipData.isLeftHalf 
+              ? tooltipData.x + 60 
+              : tooltipData.x + 30,
             top: tooltipData.y + 20,
-            transform: 'translateX(-50%)',
+            transform: tooltipData.isLeftHalf 
+              ? 'translateY(-50%)' 
+              : 'translateX(-100%) translateY(-50%)',
           }}
         >
           <p className="text-xs text-foreground font-medium mb-1.5">{tooltipData.date}</p>
