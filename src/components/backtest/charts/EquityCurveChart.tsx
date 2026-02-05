@@ -14,12 +14,12 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     return (
-      <div className="bg-[#1a2332] border border-[#2a3a4a] rounded-lg px-4 py-3 shadow-xl">
-        <p className="text-sm text-foreground font-medium mb-1">{data.date}</p>
+      <div className="bg-[#0f1a24]/95 border border-[#1e2d3d] rounded px-3 py-2 shadow-lg backdrop-blur-sm">
+        <p className="text-xs text-foreground font-medium mb-1.5">{data.date}</p>
         <div className="flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-sm bg-[#4fd1c5]" />
-          <span className="text-sm text-muted-foreground">DFcovenant:</span>
-          <span className="text-sm font-mono text-foreground">{formatCurrency(data.equity)}</span>
+          <span className="w-2 h-2 rounded-sm bg-[#4fd1c5]" />
+          <span className="text-xs text-muted-foreground">DFcovenant:</span>
+          <span className="text-xs font-mono text-foreground">{formatCurrency(data.equity)}</span>
         </div>
       </div>
     );
@@ -32,8 +32,8 @@ const EquityCurveChart = () => {
   const endEquity = equityCurveData[equityCurveData.length - 1]?.equity || 10000;
   
   return (
-    <div className="w-full h-[400px] bg-[#0d1421] rounded-xl p-6">
-      <h3 className="text-foreground text-sm font-medium mb-4">
+    <div className="w-full h-[420px] bg-[#0a1018] rounded-xl p-6">
+      <h3 className="text-muted-foreground text-sm mb-6">
         Equity Curve in EUR (2016-2026) — {formatCurrency(startEquity)} → {formatCurrency(endEquity)}
       </h3>
       <ResponsiveContainer width="100%" height="100%">
@@ -42,41 +42,45 @@ const EquityCurveChart = () => {
           margin={{ top: 10, right: 30, left: 20, bottom: 10 }}
         >
           <CartesianGrid 
-            strokeDasharray="0" 
-            stroke="#1e2d3d" 
+            strokeDasharray="0"
+            stroke="#1a2535"
+            strokeOpacity={0.4}
             vertical={true}
             horizontal={true}
           />
           <XAxis 
             dataKey="date" 
-            stroke="#4a5568"
+            stroke="transparent"
             fontSize={11}
             tickLine={false}
             axisLine={false}
-            interval={11}
-            tick={{ fill: '#718096' }}
+            interval={14}
+            tick={{ fill: '#4a5568' }}
           />
           <YAxis 
             tickFormatter={(value) => `€${value.toLocaleString()}`}
-            stroke="#4a5568"
+            stroke="transparent"
             fontSize={11}
             tickLine={false}
             axisLine={false}
-            tick={{ fill: '#718096' }}
+            tick={{ fill: '#4a5568' }}
             width={80}
           />
-          <Tooltip content={<CustomTooltip />} />
+          <Tooltip 
+            content={<CustomTooltip />}
+            cursor={false}
+          />
           <Line
             type="monotone"
             dataKey="equity"
             stroke="#4fd1c5"
-            strokeWidth={1.5}
+            strokeWidth={1.2}
             dot={false}
             activeDot={{ 
-              r: 4, 
+              r: 3, 
               stroke: "#4fd1c5", 
-              strokeWidth: 2, 
-              fill: "#0d1421" 
+              strokeWidth: 1.5, 
+              fill: "#0a1018" 
             }}
           />
         </LineChart>
