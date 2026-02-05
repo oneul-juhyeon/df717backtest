@@ -54,6 +54,10 @@
        }
      }
      
+      // Log extracted strategy names for debugging
+      console.log('[useCorrelationData] Extracted normalizedCurves keys:', Object.keys(normalizedCurves));
+      console.log('[useCorrelationData] Sample values - first strategy:', Object.values(normalizedCurves)[0]?.slice(0, 5));
+      
      // Look for combinedEquity array
      const combinedMatch = html.match(/(?:const|var|let)\s+combinedEquity\s*=\s*\[([\d.,\s\n-]+)\];/);
      if (combinedMatch) {
