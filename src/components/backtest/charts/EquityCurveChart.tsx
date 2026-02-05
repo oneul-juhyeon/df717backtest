@@ -124,7 +124,8 @@ const EquityCurveChart = () => {
             top,
             transform,
             width: TOOLTIP_W,
-            transition: 'left 70ms linear, top 70ms linear',
+             // Move immediately with the cursor (no smoothing/lag)
+             willChange: 'left, top, transform',
           }}
         >
           <p className="text-xs text-foreground font-medium mb-1.5">{tooltipData.date}</p>
