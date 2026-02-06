@@ -11,7 +11,7 @@ import DurationVsProfitScatter from "@/components/backtest/charts/DurationVsProf
 import DurationDistributionChart from "@/components/backtest/charts/DurationDistributionChart";
 import TradesTable from "@/components/backtest/TradesTable";
 import { reportInfo, advancedStats, longShortData, drawdownsData, monthlyPerformanceMatrix } from "@/data/backtestData";
-import StrategyNav from "@/components/backtest/StrategyNav";
+import StrategySelector from "@/components/backtest/StrategySelector";
 
 const BacktestReport = () => {
   const { 
@@ -41,7 +41,7 @@ const BacktestReport = () => {
               <ArrowLeft className="w-4 h-4" />
               Back to Overview
             </Link>
-            <StrategyNav currentStrategy="dfcovenant" />
+            <StrategySelector currentStrategy="dfcovenant" context="report" />
           </div>
           <div className="text-center">
             <h1 className="text-2xl font-bold">

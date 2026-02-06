@@ -17,7 +17,7 @@ import {
   dftrustDrawdownsData, 
   dftrustMonthlyPerformanceMatrix 
 } from "@/data/dftrustData";
-import StrategyNav from "@/components/backtest/StrategyNav";
+import StrategySelector from "@/components/backtest/StrategySelector";
 
 const DFtrustReport = () => {
   const { 
@@ -47,7 +47,7 @@ const DFtrustReport = () => {
               <ArrowLeft className="w-4 h-4" />
               Back to DFtrust
             </Link>
-            <StrategyNav currentStrategy="dftrust" />
+            <StrategySelector currentStrategy="dftrust" context="report" />
           </div>
           <div className="text-center">
             <h1 className="text-2xl font-bold">
