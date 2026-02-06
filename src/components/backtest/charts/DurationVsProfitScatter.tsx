@@ -11,11 +11,11 @@ interface Props {
 }
 
 const formatCurrency = (value: number) => {
-  return new Intl.NumberFormat('en-US', {
+  return new Intl.NumberFormat('de-DE', {
     style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
+    currency: 'EUR',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   }).format(value);
 };
 
@@ -44,10 +44,10 @@ const DurationVsProfitScatter = ({ data }: Props) => {
     }
   };
 
-  // Calculate axis bounds
-  const maxDuration = Math.max(...data.map(d => d.durationHours), 90);
-  const maxProfit = Math.max(...data.map(d => d.profit), 40000);
-  const minProfit = Math.min(...data.map(d => d.profit), -20000);
+  // Fixed axis bounds matching reference
+  const maxDuration = 90;
+  const maxProfit = 40000;
+  const minProfit = -20000;
 
   return (
     <div className="w-full h-[320px] relative">
@@ -127,11 +127,8 @@ const DurationVsProfitScatter = ({ data }: Props) => {
               willChange: 'left, top, transform',
             }}
           >
-            <p className="text-sm text-foreground font-bold mb-1">
-              {dataPoint.durationHours.toFixed(1)} hours
-            </p>
-            <p className={`font-mono text-xs ${isPositive ? 'text-success' : 'text-destructive'}`}>
-              Profit: {isPositive ? '+' : ''}{formatCurrency(dataPoint.profit)}
+            <p className={`font-mono text-sm ${isPositive ? 'text-success' : 'text-destructive'}`}>
+              Duration: {dataPoint.durationHours.toFixed(1)}h | Profit: {isPositive ? '+' : ''}{formatCurrency(dataPoint.profit)}
             </p>
           </div>
         );
