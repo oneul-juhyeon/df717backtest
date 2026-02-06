@@ -1,5 +1,5 @@
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area } from "recharts";
-import { useState } from "react";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { useState, useRef } from "react";
 import { EquityDataPoint } from "@/hooks/useBacktestData";
 
 interface Props {
@@ -19,10 +19,14 @@ const formatAxisValue = (value: number) => {
   if (value >= 1000000) {
     return `$${(value / 1000000).toFixed(0)}M`;
   }
-  return `$${(value / 1000).toFixed(0)},000`;
+  if (value >= 1000) {
+    return `$${(value / 1000).toFixed(0)}k`;
+  }
+  return `$${value}`;
 };
 
 const BacktestEquityCurveChart = ({ data }: Props) => {
+  const chartRef = useRef<HTMLDivElement>(null);
   const [tooltipData, setTooltipData] = useState<{
     x: number;
     y: number;
@@ -56,9 +60,9 @@ const BacktestEquityCurveChart = ({ data }: Props) => {
     : data;
 
   return (
-    <div className="w-full h-[380px] relative">
+    <div ref={chartRef} className="w-full h-[380px] relative">
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart
+        <AreaChart
           data={chartData}
           margin={{ top: 10, right: 30, left: 10, bottom: 10 }}
           onMouseMove={handleMouseMove}
@@ -101,14 +105,9 @@ const BacktestEquityCurveChart = ({ data }: Props) => {
           <Area
             type="monotone"
             dataKey="equity"
-            stroke="none"
-            fill="url(#btEquityAreaGradient)"
-          />
-          <Line
-            type="monotone"
-            dataKey="equity"
             stroke="#4fd1c5"
             strokeWidth={2.4}
+            fill="url(#btEquityAreaGradient)"
             dot={false}
             activeDot={{
               r: 5,
@@ -117,7 +116,7 @@ const BacktestEquityCurveChart = ({ data }: Props) => {
               strokeWidth: 1.5,
             }}
           />
-        </LineChart>
+        </AreaChart>
       </ResponsiveContainer>
       
       {tooltipData && (() => {
