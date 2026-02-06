@@ -5,7 +5,7 @@ import DFtrustTabsContainer from "@/components/backtest/DFtrustTabsContainer";
 const DFtrustIndex = () => {
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      <Header currentStrategy="dftrust" />
       <main>
         <DFtrustHeroSection />
         <DFtrustTabsContainer />
