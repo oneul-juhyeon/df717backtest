@@ -15,14 +15,14 @@ const formatCurrency = (value: number) => {
 const TradesTable = ({ data, totalTrades }: Props) => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 50;
-  const totalPages = Math.ceil(data.length / itemsPerPage);
+  const totalPages = Math.max(1, Math.ceil(data.length / itemsPerPage));
 
   const paginatedData = data.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
 
-  const displayCount = Math.min(data.length, 200);
+  const displayCount = data.length;
 
   return (
     <div className="bg-card border border-border rounded-lg overflow-hidden">
@@ -69,28 +69,36 @@ const TradesTable = ({ data, totalTrades }: Props) => {
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {paginatedData.map((trade) => (
-              <tr key={trade.id} className="hover:bg-muted/30">
-                <td className="px-3 py-2 font-mono">{trade.openTime}</td>
-                <td className="px-3 py-2">
-                  <span className={trade.type.toLowerCase() === 'buy' ? 'text-success' : 'text-destructive'}>
-                    {trade.type}
-                  </span>
-                </td>
-                <td className="px-3 py-2 text-right font-mono">{trade.volume.toFixed(2)}</td>
-                <td className="px-3 py-2">{trade.symbol}</td>
-                <td className="px-3 py-2 text-right font-mono">{trade.openPrice.toFixed(2)}</td>
-                <td className="px-3 py-2 text-right font-mono text-muted-foreground">{trade.sl > 0 ? trade.sl.toFixed(2) : '-'}</td>
-                <td className="px-3 py-2 text-right font-mono text-muted-foreground">{trade.tp > 0 ? trade.tp.toFixed(2) : '-'}</td>
-                <td className="px-3 py-2 font-mono">{trade.closeTime}</td>
-                <td className="px-3 py-2 text-right font-mono">{trade.closePrice.toFixed(2)}</td>
-                <td className="px-3 py-2 text-right font-mono text-muted-foreground">{trade.commission.toFixed(2)}</td>
-                <td className="px-3 py-2 text-right font-mono text-muted-foreground">{trade.swap.toFixed(2)}</td>
-                <td className={`px-3 py-2 text-right font-mono ${trade.profit >= 0 ? 'text-success' : 'text-destructive'}`}>
-                  {formatCurrency(trade.profit)}
+            {paginatedData.length > 0 ? (
+              paginatedData.map((trade) => (
+                <tr key={trade.id} className="hover:bg-muted/30">
+                  <td className="px-3 py-2 font-mono">{trade.openTime}</td>
+                  <td className="px-3 py-2">
+                    <span className={trade.type.toLowerCase() === 'buy' ? 'text-success' : 'text-destructive'}>
+                      {trade.type}
+                    </span>
+                  </td>
+                  <td className="px-3 py-2 text-right font-mono">{trade.volume.toFixed(2)}</td>
+                  <td className="px-3 py-2">{trade.symbol}</td>
+                  <td className="px-3 py-2 text-right font-mono">{trade.openPrice.toFixed(2)}</td>
+                  <td className="px-3 py-2 text-right font-mono text-muted-foreground">{trade.sl > 0 ? trade.sl.toFixed(2) : '-'}</td>
+                  <td className="px-3 py-2 text-right font-mono text-muted-foreground">{trade.tp > 0 ? trade.tp.toFixed(2) : '-'}</td>
+                  <td className="px-3 py-2 font-mono">{trade.closeTime}</td>
+                  <td className="px-3 py-2 text-right font-mono">{trade.closePrice.toFixed(2)}</td>
+                  <td className="px-3 py-2 text-right font-mono text-muted-foreground">{trade.commission.toFixed(2)}</td>
+                  <td className="px-3 py-2 text-right font-mono text-muted-foreground">{trade.swap.toFixed(2)}</td>
+                  <td className={`px-3 py-2 text-right font-mono ${trade.profit >= 0 ? 'text-success' : 'text-destructive'}`}>
+                    {formatCurrency(trade.profit)}
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={12} className="px-3 py-8 text-center text-muted-foreground">
+                  Loading trade data from backtest report...
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>

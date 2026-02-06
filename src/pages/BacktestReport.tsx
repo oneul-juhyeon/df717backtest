@@ -7,7 +7,7 @@ import BacktestMonthlyReturnsChart from "@/components/backtest/charts/BacktestMo
 import BacktestDistributionChart from "@/components/backtest/charts/BacktestDistributionChart";
 import ProfitByHourChart from "@/components/backtest/charts/ProfitByHourChart";
 import ProfitByDayChart from "@/components/backtest/charts/ProfitByDayChart";
-import DurationProfitChart from "@/components/backtest/charts/DurationProfitChart";
+import DurationVsProfitScatter from "@/components/backtest/charts/DurationVsProfitScatter";
 import DurationDistributionChart from "@/components/backtest/charts/DurationDistributionChart";
 import TradesTable from "@/components/backtest/TradesTable";
 import { reportInfo, advancedStats, longShortData, drawdownsData, monthlyPerformanceMatrix } from "@/data/backtestData";
@@ -20,9 +20,10 @@ const BacktestReport = () => {
     distributionData,
     hourProfitData,
     dayProfitData,
-    durationProfitData,
+    durationVsProfitData,
     durationDistData,
     tradesData,
+    totalTrades,
     isLoading 
   } = useBacktestData();
 
@@ -235,11 +236,11 @@ const BacktestReport = () => {
           <div className="bg-card border border-border rounded-lg p-6">
             <h3 className="text-lg font-semibold mb-4">Duration vs Profit</h3>
             {isLoading ? (
-              <div className="h-[274px] flex items-center justify-center text-muted-foreground">Loading...</div>
-            ) : durationProfitData.length > 0 ? (
-              <DurationProfitChart data={durationProfitData} />
+              <div className="h-[320px] flex items-center justify-center text-muted-foreground">Loading...</div>
+            ) : durationVsProfitData.length > 0 ? (
+              <DurationVsProfitScatter data={durationVsProfitData} />
             ) : (
-              <div className="h-[274px] flex items-center justify-center text-muted-foreground">No data available</div>
+              <div className="h-[320px] flex items-center justify-center text-muted-foreground">No data available</div>
             )}
           </div>
           <div className="bg-card border border-border rounded-lg p-6">
@@ -384,11 +385,9 @@ const BacktestReport = () => {
         </div>
 
         {/* Trades Table */}
-        {!isLoading && tradesData.length > 0 && (
-          <div className="mb-8">
-            <TradesTable data={tradesData.slice(0, 200)} totalTrades={988} />
-          </div>
-        )}
+        <div className="mb-8">
+          <TradesTable data={tradesData.slice(0, 200)} totalTrades={totalTrades} />
+        </div>
       </main>
 
       {/* Footer */}
