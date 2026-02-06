@@ -1,17 +1,31 @@
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
-import EquityCurveChart from "@/components/backtest/charts/EquityCurveChart";
-import DailyPnLChart from "@/components/backtest/charts/DailyPnLChart";
-import MonthlyReturnsChart from "@/components/backtest/charts/MonthlyReturnsChart";
-import DistributionChart from "@/components/backtest/charts/DistributionChart";
+import { useBacktestData } from "@/hooks/useBacktestData";
+import BacktestEquityCurveChart from "@/components/backtest/charts/BacktestEquityCurveChart";
+import BacktestDailyPnLChart from "@/components/backtest/charts/BacktestDailyPnLChart";
+import BacktestMonthlyReturnsChart from "@/components/backtest/charts/BacktestMonthlyReturnsChart";
+import BacktestDistributionChart from "@/components/backtest/charts/BacktestDistributionChart";
+import ProfitByHourChart from "@/components/backtest/charts/ProfitByHourChart";
+import ProfitByDayChart from "@/components/backtest/charts/ProfitByDayChart";
+import DurationProfitChart from "@/components/backtest/charts/DurationProfitChart";
+import DurationDistributionChart from "@/components/backtest/charts/DurationDistributionChart";
+import TradesTable from "@/components/backtest/TradesTable";
 import { reportInfo, advancedStats, longShortData, drawdownsData, monthlyPerformanceMatrix } from "@/data/backtestData";
 
-const formatCurrency = (value: number) => {
-  const sign = value >= 0 ? '+' : '';
-  return `${sign}$${Math.abs(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-};
-
 const BacktestReport = () => {
+  const { 
+    equityData, 
+    dailyPnLData, 
+    monthlyReturnsData, 
+    distributionData,
+    hourProfitData,
+    dayProfitData,
+    durationProfitData,
+    durationDistData,
+    tradesData,
+    isLoading 
+  } = useBacktestData();
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
@@ -147,24 +161,96 @@ const BacktestReport = () => {
         {/* Equity Curve */}
         <div className="bg-card border border-border rounded-lg p-6 mb-6">
           <h3 className="text-lg font-semibold mb-4">Equity Curve</h3>
-          <EquityCurveChart />
+          {isLoading ? (
+            <div className="h-[380px] flex items-center justify-center text-muted-foreground">Loading chart data...</div>
+          ) : equityData.length > 0 ? (
+            <BacktestEquityCurveChart data={equityData} />
+          ) : (
+            <div className="h-[380px] flex items-center justify-center text-muted-foreground">No equity data available</div>
+          )}
         </div>
 
         {/* Daily P&L */}
         <div className="bg-card border border-border rounded-lg p-6 mb-6">
           <h3 className="text-lg font-semibold mb-4">Daily P&L</h3>
-          <DailyPnLChart />
+          {isLoading ? (
+            <div className="h-[300px] flex items-center justify-center text-muted-foreground">Loading chart data...</div>
+          ) : dailyPnLData.length > 0 ? (
+            <BacktestDailyPnLChart data={dailyPnLData} />
+          ) : (
+            <div className="h-[300px] flex items-center justify-center text-muted-foreground">No daily P&L data available</div>
+          )}
         </div>
 
-        {/* Charts Row */}
+        {/* Charts Row - Monthly Returns & Distribution */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div className="bg-card border border-border rounded-lg p-6">
             <h3 className="text-lg font-semibold mb-4">Monthly Returns</h3>
-            <MonthlyReturnsChart />
+            {isLoading ? (
+              <div className="h-[274px] flex items-center justify-center text-muted-foreground">Loading...</div>
+            ) : monthlyReturnsData.length > 0 ? (
+              <BacktestMonthlyReturnsChart data={monthlyReturnsData} />
+            ) : (
+              <div className="h-[274px] flex items-center justify-center text-muted-foreground">No data available</div>
+            )}
           </div>
           <div className="bg-card border border-border rounded-lg p-6">
             <h3 className="text-lg font-semibold mb-4">Distribution</h3>
-            <DistributionChart />
+            {isLoading ? (
+              <div className="h-[274px] flex items-center justify-center text-muted-foreground">Loading...</div>
+            ) : distributionData.length > 0 ? (
+              <BacktestDistributionChart data={distributionData} />
+            ) : (
+              <div className="h-[274px] flex items-center justify-center text-muted-foreground">No data available</div>
+            )}
+          </div>
+        </div>
+
+        {/* Charts Row - Profit by Hour & Profit by Day */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <div className="bg-card border border-border rounded-lg p-6">
+            <h3 className="text-lg font-semibold mb-4">Profit by Hour</h3>
+            {isLoading ? (
+              <div className="h-[274px] flex items-center justify-center text-muted-foreground">Loading...</div>
+            ) : hourProfitData.length > 0 ? (
+              <ProfitByHourChart data={hourProfitData} />
+            ) : (
+              <div className="h-[274px] flex items-center justify-center text-muted-foreground">No data available</div>
+            )}
+          </div>
+          <div className="bg-card border border-border rounded-lg p-6">
+            <h3 className="text-lg font-semibold mb-4">Profit by Day of Week</h3>
+            {isLoading ? (
+              <div className="h-[274px] flex items-center justify-center text-muted-foreground">Loading...</div>
+            ) : dayProfitData.length > 0 ? (
+              <ProfitByDayChart data={dayProfitData} />
+            ) : (
+              <div className="h-[274px] flex items-center justify-center text-muted-foreground">No data available</div>
+            )}
+          </div>
+        </div>
+
+        {/* Charts Row - Duration vs Profit & Duration Distribution */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <div className="bg-card border border-border rounded-lg p-6">
+            <h3 className="text-lg font-semibold mb-4">Duration vs Profit</h3>
+            {isLoading ? (
+              <div className="h-[274px] flex items-center justify-center text-muted-foreground">Loading...</div>
+            ) : durationProfitData.length > 0 ? (
+              <DurationProfitChart data={durationProfitData} />
+            ) : (
+              <div className="h-[274px] flex items-center justify-center text-muted-foreground">No data available</div>
+            )}
+          </div>
+          <div className="bg-card border border-border rounded-lg p-6">
+            <h3 className="text-lg font-semibold mb-4">Duration Distribution</h3>
+            {isLoading ? (
+              <div className="h-[274px] flex items-center justify-center text-muted-foreground">Loading...</div>
+            ) : durationDistData.length > 0 ? (
+              <DurationDistributionChart data={durationDistData} />
+            ) : (
+              <div className="h-[274px] flex items-center justify-center text-muted-foreground">No data available</div>
+            )}
           </div>
         </div>
 
@@ -296,6 +382,13 @@ const BacktestReport = () => {
             </table>
           </div>
         </div>
+
+        {/* Trades Table */}
+        {!isLoading && tradesData.length > 0 && (
+          <div className="mb-8">
+            <TradesTable data={tradesData.slice(0, 200)} totalTrades={988} />
+          </div>
+        )}
       </main>
 
       {/* Footer */}
