@@ -1,6 +1,6 @@
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useBacktestData } from "@/hooks/useBacktestData";
+import { useDFtrustData } from "@/hooks/useDFtrustData";
 import BacktestEquityCurveChart from "@/components/backtest/charts/BacktestEquityCurveChart";
 import BacktestDailyPnLChart from "@/components/backtest/charts/BacktestDailyPnLChart";
 import BacktestMonthlyReturnsChart from "@/components/backtest/charts/BacktestMonthlyReturnsChart";
@@ -10,10 +10,16 @@ import ProfitByDayChart from "@/components/backtest/charts/ProfitByDayChart";
 import DurationVsProfitScatter from "@/components/backtest/charts/DurationVsProfitScatter";
 import DurationDistributionChart from "@/components/backtest/charts/DurationDistributionChart";
 import TradesTable from "@/components/backtest/TradesTable";
-import { reportInfo, advancedStats, longShortData, drawdownsData, monthlyPerformanceMatrix } from "@/data/backtestData";
+import { 
+  dftrustReportInfo, 
+  dftrustAdvancedStats, 
+  dftrustLongShortData, 
+  dftrustDrawdownsData, 
+  dftrustMonthlyPerformanceMatrix 
+} from "@/data/dftrustData";
 import StrategyNav from "@/components/backtest/StrategyNav";
 
-const BacktestReport = () => {
+const DFtrustReport = () => {
   const { 
     equityData, 
     dailyPnLData, 
@@ -26,7 +32,7 @@ const BacktestReport = () => {
     tradesData,
     totalTrades,
     isLoading 
-  } = useBacktestData();
+  } = useDFtrustData();
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -41,7 +47,7 @@ const BacktestReport = () => {
               <ArrowLeft className="w-4 h-4" />
               Back to Overview
             </Link>
-            <StrategyNav currentStrategy="dfcovenant" />
+            <StrategyNav currentStrategy="dftrust" />
           </div>
           <div className="text-center">
             <h1 className="text-2xl font-bold">
@@ -49,9 +55,9 @@ const BacktestReport = () => {
               <span className="text-primary">717</span>
               <span className="text-muted-foreground ml-2">Analytics</span>
             </h1>
-            <p className="text-muted-foreground mt-1">Backtest Analysis Report - DFcovenant</p>
+            <p className="text-muted-foreground mt-1">Backtest Analysis Report - DFtrust</p>
             <p className="text-xs text-muted-foreground font-mono mt-2">
-              Generated: {reportInfo.generatedDate}
+              Generated: {dftrustReportInfo.generatedDate}
             </p>
           </div>
         </div>
@@ -63,37 +69,37 @@ const BacktestReport = () => {
           <div className="flex flex-wrap justify-center gap-4 md:gap-8 text-sm">
             <div className="text-center">
               <span className="text-muted-foreground text-xs block">EA</span>
-              <span className="font-medium">{reportInfo.ea}</span>
+              <span className="font-medium">{dftrustReportInfo.ea}</span>
             </div>
             <div className="hidden md:block w-px h-8 bg-border" />
             <div className="text-center">
               <span className="text-muted-foreground text-xs block">Symbol</span>
-              <span className="font-medium">{reportInfo.symbol}</span>
+              <span className="font-medium">{dftrustReportInfo.symbol}</span>
             </div>
             <div className="hidden md:block w-px h-8 bg-border" />
             <div className="text-center">
               <span className="text-muted-foreground text-xs block">Period</span>
-              <span className="font-medium">{reportInfo.period}</span>
+              <span className="font-medium">{dftrustReportInfo.period}</span>
             </div>
             <div className="hidden md:block w-px h-8 bg-border" />
             <div className="text-center">
               <span className="text-muted-foreground text-xs block">Dates</span>
-              <span className="font-medium">{reportInfo.dates}</span>
+              <span className="font-medium">{dftrustReportInfo.dates}</span>
             </div>
             <div className="hidden md:block w-px h-8 bg-border" />
             <div className="text-center">
               <span className="text-muted-foreground text-xs block">Deposit</span>
-              <span className="font-medium">{reportInfo.deposit}</span>
+              <span className="font-medium">{dftrustReportInfo.deposit}</span>
             </div>
             <div className="hidden md:block w-px h-8 bg-border" />
             <div className="text-center">
               <span className="text-muted-foreground text-xs block">Leverage</span>
-              <span className="font-medium">{reportInfo.leverage}</span>
+              <span className="font-medium">{dftrustReportInfo.leverage}</span>
             </div>
             <div className="hidden md:block w-px h-8 bg-border" />
             <div className="text-center">
               <span className="text-muted-foreground text-xs block">Trades</span>
-              <span className="font-medium">{reportInfo.trades}</span>
+              <span className="font-medium">{dftrustReportInfo.trades}</span>
             </div>
           </div>
         </div>
@@ -104,31 +110,31 @@ const BacktestReport = () => {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
           <div className="bg-card border border-border rounded-lg p-4 text-center">
             <p className="text-xs text-muted-foreground mb-1">NET PROFIT</p>
-            <p className="text-xl font-bold text-success">+$722,988.07</p>
-            <p className="text-xs text-muted-foreground mt-1">988 trades</p>
+            <p className="text-xl font-bold text-success">+$3,306.36</p>
+            <p className="text-xs text-muted-foreground mt-1">1246 trades</p>
           </div>
           <div className="bg-card border border-border rounded-lg p-4 text-center">
             <p className="text-xs text-muted-foreground mb-1">WIN RATE</p>
-            <p className="text-xl font-bold text-primary">66.0%</p>
-            <p className="text-xs text-muted-foreground mt-1">652W / 336L</p>
+            <p className="text-xl font-bold text-primary">61.8%</p>
+            <p className="text-xs text-muted-foreground mt-1">770W / 476L</p>
           </div>
           <div className="bg-card border border-border rounded-lg p-4 text-center">
             <p className="text-xs text-muted-foreground mb-1">PROFIT FACTOR</p>
-            <p className="text-xl font-bold text-success">3.31</p>
-            <p className="text-xs text-muted-foreground mt-1">GP: $1,032,652.68</p>
+            <p className="text-xl font-bold text-success">1.44</p>
+            <p className="text-xs text-muted-foreground mt-1">GP: $8,427.39</p>
           </div>
           <div className="bg-card border border-border rounded-lg p-4 text-center">
             <p className="text-xs text-muted-foreground mb-1">MAX DRAWDOWN</p>
-            <p className="text-xl font-bold text-destructive">11.2%</p>
-            <p className="text-xs text-muted-foreground mt-1">-$32,502.37</p>
+            <p className="text-xl font-bold text-destructive">12.2%</p>
+            <p className="text-xs text-muted-foreground mt-1">-$257.34</p>
           </div>
           <div className="bg-card border border-border rounded-lg p-4 text-center">
             <p className="text-xs text-muted-foreground mb-1">BEST TRADE</p>
-            <p className="text-xl font-bold text-success">+$36,945.05</p>
+            <p className="text-xl font-bold text-success">+$91.60</p>
           </div>
           <div className="bg-card border border-border rounded-lg p-4 text-center">
             <p className="text-xs text-muted-foreground mb-1">WORST TRADE</p>
-            <p className="text-xl font-bold text-destructive">-$18,987.81</p>
+            <p className="text-xl font-bold text-destructive">-$61.20</p>
           </div>
         </div>
 
@@ -138,25 +144,25 @@ const BacktestReport = () => {
           <div className="bg-card border border-border rounded-lg p-4">
             <h4 className="text-success font-semibold mb-3">Long (Buy)</h4>
             <div className="space-y-2 text-sm">
-              <div className="flex justify-between"><span className="text-muted-foreground">Trades</span><span>{longShortData.long.trades}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Win Rate</span><span>{longShortData.long.winRate}%</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Profit</span><span className="text-success">+${longShortData.long.profit.toLocaleString()}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Avg Profit</span><span className="text-success">+${longShortData.long.avgProfit.toLocaleString()}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Best</span><span className="text-success">+${longShortData.long.best.toLocaleString()}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Worst</span><span className="text-destructive">-${Math.abs(longShortData.long.worst).toLocaleString()}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Volume</span><span>{longShortData.long.volume.toLocaleString()}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Trades</span><span>{dftrustLongShortData.long.trades}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Win Rate</span><span>{dftrustLongShortData.long.winRate}%</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Profit</span><span className="text-success">+${dftrustLongShortData.long.profit.toLocaleString()}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Avg Profit</span><span className="text-success">+${dftrustLongShortData.long.avgProfit.toLocaleString()}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Best</span><span className="text-success">+${dftrustLongShortData.long.best.toLocaleString()}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Worst</span><span className="text-destructive">-${Math.abs(dftrustLongShortData.long.worst).toLocaleString()}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Volume</span><span>{dftrustLongShortData.long.volume.toLocaleString()}</span></div>
             </div>
           </div>
           <div className="bg-card border border-border rounded-lg p-4">
             <h4 className="text-destructive font-semibold mb-3">Short (Sell)</h4>
             <div className="space-y-2 text-sm">
-              <div className="flex justify-between"><span className="text-muted-foreground">Trades</span><span>{longShortData.short.trades}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Win Rate</span><span>{longShortData.short.winRate}%</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Profit</span><span className="text-success">+${longShortData.short.profit.toLocaleString()}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Avg Profit</span><span className="text-success">+${longShortData.short.avgProfit.toLocaleString()}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Best</span><span className="text-success">+${longShortData.short.best.toLocaleString()}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Worst</span><span className="text-destructive">-${Math.abs(longShortData.short.worst).toLocaleString()}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Volume</span><span>{longShortData.short.volume.toLocaleString()}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Trades</span><span>{dftrustLongShortData.short.trades}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Win Rate</span><span>{dftrustLongShortData.short.winRate}%</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Profit</span><span className="text-success">+${dftrustLongShortData.short.profit.toLocaleString()}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Avg Profit</span><span className="text-success">+${dftrustLongShortData.short.avgProfit.toLocaleString()}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Best</span><span className="text-success">+${dftrustLongShortData.short.best.toLocaleString()}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Worst</span><span className="text-destructive">-${Math.abs(dftrustLongShortData.short.worst).toLocaleString()}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Volume</span><span>{dftrustLongShortData.short.volume.toLocaleString()}</span></div>
             </div>
           </div>
         </div>
@@ -263,56 +269,56 @@ const BacktestReport = () => {
           <div className="bg-card border border-border rounded-lg p-4">
             <h4 className="text-sm font-medium text-primary mb-3">Performance</h4>
             <div className="space-y-2 text-xs">
-              <div className="flex justify-between"><span className="text-muted-foreground">Net Profit</span><span className="text-success">+${advancedStats.performance.netProfit.toLocaleString()}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Gross Profit</span><span className="text-success">+${advancedStats.performance.grossProfit.toLocaleString()}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Gross Loss</span><span className="text-destructive">-${Math.abs(advancedStats.performance.grossLoss).toLocaleString()}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Profit Factor</span><span>{advancedStats.performance.profitFactor}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Expectancy</span><span className="text-success">+${advancedStats.performance.expectancy}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Sharpe Ratio</span><span>{advancedStats.performance.sharpeRatio}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Net Profit</span><span className="text-success">+${dftrustAdvancedStats.performance.netProfit.toLocaleString()}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Gross Profit</span><span className="text-success">+${dftrustAdvancedStats.performance.grossProfit.toLocaleString()}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Gross Loss</span><span className="text-destructive">-${Math.abs(dftrustAdvancedStats.performance.grossLoss).toLocaleString()}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Profit Factor</span><span>{dftrustAdvancedStats.performance.profitFactor}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Expectancy</span><span className="text-success">+${dftrustAdvancedStats.performance.expectancy}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Sharpe Ratio</span><span>{dftrustAdvancedStats.performance.sharpeRatio}</span></div>
             </div>
           </div>
           <div className="bg-card border border-border rounded-lg p-4">
             <h4 className="text-sm font-medium text-primary mb-3">Risk Ratios</h4>
             <div className="space-y-2 text-xs">
-              <div className="flex justify-between"><span className="text-muted-foreground">Sortino Ratio</span><span>{advancedStats.riskRatios.sortinoRatio}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Calmar Ratio</span><span>{advancedStats.riskRatios.calmarRatio}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Recovery Factor</span><span>{advancedStats.riskRatios.recoveryFactor}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Kelly Criterion</span><span>{advancedStats.riskRatios.kellyCriterion}%</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Risk/Reward</span><span>{advancedStats.riskRatios.riskReward}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Avg Duration</span><span>{advancedStats.riskRatios.avgDuration}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Sortino Ratio</span><span>{dftrustAdvancedStats.riskRatios.sortinoRatio}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Calmar Ratio</span><span>{dftrustAdvancedStats.riskRatios.calmarRatio}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Recovery Factor</span><span>{dftrustAdvancedStats.riskRatios.recoveryFactor}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Kelly Criterion</span><span>{dftrustAdvancedStats.riskRatios.kellyCriterion}%</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Risk/Reward</span><span>{dftrustAdvancedStats.riskRatios.riskReward}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Avg Duration</span><span>{dftrustAdvancedStats.riskRatios.avgDuration}</span></div>
             </div>
           </div>
           <div className="bg-card border border-border rounded-lg p-4">
             <h4 className="text-sm font-medium text-primary mb-3">Trade Stats</h4>
             <div className="space-y-2 text-xs">
-              <div className="flex justify-between"><span className="text-muted-foreground">Total Trades</span><span>{advancedStats.tradeStats.totalTrades}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Win Rate</span><span>{advancedStats.tradeStats.winRate}%</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Winning</span><span>{advancedStats.tradeStats.winning}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Losing</span><span>{advancedStats.tradeStats.losing}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Breakeven</span><span>{advancedStats.tradeStats.breakeven}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Days Traded</span><span>{advancedStats.tradeStats.daysTraded}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Total Trades</span><span>{dftrustAdvancedStats.tradeStats.totalTrades}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Win Rate</span><span>{dftrustAdvancedStats.tradeStats.winRate}%</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Winning</span><span>{dftrustAdvancedStats.tradeStats.winning}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Losing</span><span>{dftrustAdvancedStats.tradeStats.losing}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Breakeven</span><span>{dftrustAdvancedStats.tradeStats.breakeven}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Days Traded</span><span>{dftrustAdvancedStats.tradeStats.daysTraded}</span></div>
             </div>
           </div>
           <div className="bg-card border border-border rounded-lg p-4">
             <h4 className="text-sm font-medium text-primary mb-3">Risk</h4>
             <div className="space-y-2 text-xs">
-              <div className="flex justify-between"><span className="text-muted-foreground">Equity DD %</span><span className="text-destructive">{advancedStats.risk.equityDDPercent}%</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Balance DD %</span><span className="text-destructive">{advancedStats.risk.balanceDDPercent}%</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Max DD Days</span><span>{advancedStats.risk.maxDDDays}d</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Max Stagnation</span><span>{advancedStats.risk.maxStagnation}d</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Best Trade</span><span className="text-success">+${advancedStats.risk.bestTrade.toLocaleString()}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Worst Trade</span><span className="text-destructive">-${Math.abs(advancedStats.risk.worstTrade).toLocaleString()}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Equity DD %</span><span className="text-destructive">{dftrustAdvancedStats.risk.equityDDPercent}%</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Balance DD %</span><span className="text-destructive">{dftrustAdvancedStats.risk.balanceDDPercent}%</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Max DD Days</span><span>{dftrustAdvancedStats.risk.maxDDDays}d</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Max Stagnation</span><span>{dftrustAdvancedStats.risk.maxStagnation}d</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Best Trade</span><span className="text-success">+${dftrustAdvancedStats.risk.bestTrade.toLocaleString()}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Worst Trade</span><span className="text-destructive">-${Math.abs(dftrustAdvancedStats.risk.worstTrade).toLocaleString()}</span></div>
             </div>
           </div>
           <div className="bg-card border border-border rounded-lg p-4">
             <h4 className="text-sm font-medium text-primary mb-3">Streaks & Costs</h4>
             <div className="space-y-2 text-xs">
-              <div className="flex justify-between"><span className="text-muted-foreground">Win Streak</span><span>{advancedStats.streaksCosts.winStreak}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Loss Streak</span><span>{advancedStats.streaksCosts.lossStreak}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Commission</span><span className="text-destructive">-${Math.abs(advancedStats.streaksCosts.commission).toLocaleString()}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Swap</span><span className="text-destructive">-${Math.abs(advancedStats.streaksCosts.swap).toLocaleString()}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Total Volume</span><span>{advancedStats.streaksCosts.totalVolume}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Avg Volume</span><span>{advancedStats.streaksCosts.avgVolume}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Win Streak</span><span>{dftrustAdvancedStats.streaksCosts.winStreak}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Loss Streak</span><span>{dftrustAdvancedStats.streaksCosts.lossStreak}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Commission</span><span className="text-destructive">-${Math.abs(dftrustAdvancedStats.streaksCosts.commission).toLocaleString()}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Swap</span><span className="text-destructive">-${Math.abs(dftrustAdvancedStats.streaksCosts.swap).toLocaleString()}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Total Volume</span><span>{dftrustAdvancedStats.streaksCosts.totalVolume}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Avg Volume</span><span>{dftrustAdvancedStats.streaksCosts.avgVolume}</span></div>
             </div>
           </div>
         </div>
@@ -334,7 +340,7 @@ const BacktestReport = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {drawdownsData.map((dd) => (
+                {dftrustDrawdownsData.map((dd) => (
                   <tr key={dd.rank} className="hover:bg-muted/30">
                     <td className="px-4 py-3">{dd.rank}</td>
                     <td className="px-4 py-3">{dd.start}</td>
@@ -365,7 +371,7 @@ const BacktestReport = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {monthlyPerformanceMatrix.map((row) => (
+                {dftrustMonthlyPerformanceMatrix.map((row) => (
                   <tr key={row.year} className="hover:bg-muted/30">
                     <td className="px-3 py-2 font-medium">{row.year}</td>
                     {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map(month => {
@@ -404,4 +410,4 @@ const BacktestReport = () => {
   );
 };
 
-export default BacktestReport;
+export default DFtrustReport;
