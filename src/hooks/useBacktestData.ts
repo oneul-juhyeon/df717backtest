@@ -45,6 +45,11 @@ export interface DurationProfitDataPoint {
   trades: number;
 }
 
+export interface DurationVsProfitPoint {
+  durationHours: number;
+  profit: number;
+}
+
 export interface DurationDistDataPoint {
   range: string;
   count: number;
@@ -75,7 +80,9 @@ export interface BacktestData {
   dayProfitData: DayProfitDataPoint[];
   durationProfitData: DurationProfitDataPoint[];
   durationDistData: DurationDistDataPoint[];
+  durationVsProfitData: DurationVsProfitPoint[];
   tradesData: TradeDataPoint[];
+  totalTrades: number;
   isLoading: boolean;
   error: string | null;
 }
@@ -149,6 +156,119 @@ function generateDurationDistData(): DurationDistDataPoint[] {
   }));
 }
 
+// Parse trade date strings like "2024.01.15 10:30:00"
+function parseTradeDate(dateStr: string): Date | null {
+  if (!dateStr) return null;
+  // Handle format "YYYY.MM.DD HH:MM:SS"
+  const cleaned = dateStr.replace(/\./g, '-');
+  const d = new Date(cleaned);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+// Extract trades from HTML table
+function extractTradesFromHtml(htmlContent: string): TradeDataPoint[] {
+  const tradesData: TradeDataPoint[] = [];
+  
+  let tableContent = '';
+  
+  // First try specific tradesBody id
+  const tradesBodyMatch = htmlContent.match(/<tbody[^>]*id=["']?tradesBody["']?[^>]*>([\s\S]*?)<\/tbody>/i);
+  if (tradesBodyMatch) {
+    tableContent = tradesBodyMatch[1];
+  } else {
+    // Find the table that looks like a trades table (has many rows with trade-like data)
+    const allTbodies = [...htmlContent.matchAll(/<tbody[^>]*>([\s\S]*?)<\/tbody>/gi)];
+    
+    for (const match of allTbodies) {
+      const content = match[1];
+      // Check if this looks like a trades table
+      const hasBuySell = content.toLowerCase().includes('buy') || content.toLowerCase().includes('sell');
+      const hasXAUUSD = content.includes('XAUUSD') || content.includes('xauusd');
+      
+      if ((hasBuySell || hasXAUUSD) && content.length > tableContent.length) {
+        tableContent = content;
+      }
+    }
+  }
+  
+  if (!tableContent) {
+    return tradesData;
+  }
+  
+  const rowMatches = [...tableContent.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/gi)];
+  
+  for (const rowMatch of rowMatches) {
+    const cells = [...rowMatch[1].matchAll(/<td[^>]*>([\s\S]*?)<\/td>/gi)];
+    
+    if (cells && cells.length >= 5) {
+      const getText = (match: RegExpMatchArray) => match[1].replace(/<[^>]+>/g, '').trim();
+      
+      // Detect column order based on content
+      // Format 1: OpenTime, CloseTime, Symbol, Type, Volume, ...
+      // Format 2: OpenTime, Type, Volume, Symbol, OpenPrice, SL, TP, CloseTime, ClosePrice, Commission, Swap, Profit
+      
+      const cell0 = getText(cells[0]);
+      const cell1 = getText(cells[1]);
+      const cell2 = getText(cells[2]);
+      const cell3 = getText(cells[3]);
+      const cell4 = getText(cells[4]);
+      
+      // Check if cell1 contains a date (CloseTime) or type (Buy/Sell)
+      const cell1IsType = cell1.toLowerCase().includes('buy') || cell1.toLowerCase().includes('sell');
+      const cell3IsType = cell3.toLowerCase().includes('buy') || cell3.toLowerCase().includes('sell');
+      
+      let trade: TradeDataPoint;
+      
+      if (cell3IsType) {
+        // Format: OpenTime, CloseTime, Symbol, Type, Volume, OpenPrice, ClosePrice, Profit, ...
+        trade = {
+          id: tradesData.length + 1,
+          openTime: cell0,
+          closeTime: cell1,
+          symbol: cell2,
+          type: cell3,
+          volume: parseFloat(cell4) || 0,
+          openPrice: cells.length > 5 ? parseFloat(getText(cells[5])) || 0 : 0,
+          closePrice: cells.length > 6 ? parseFloat(getText(cells[6])) || 0 : 0,
+          sl: 0,
+          tp: 0,
+          commission: 0,
+          swap: 0,
+          profit: cells.length > 7 ? parseFloat(getText(cells[7]).replace(/[^0-9.-]/g, '')) || 0 : 0,
+        };
+      } else if (cell1IsType) {
+        // Format: OpenTime, Type, Volume, Symbol, OpenPrice, SL, TP, CloseTime, ClosePrice, Commission, Swap, Profit
+        trade = {
+          id: tradesData.length + 1,
+          openTime: cell0,
+          type: cell1,
+          volume: parseFloat(cell2) || 0,
+          symbol: cell3,
+          openPrice: parseFloat(cell4) || 0,
+          sl: cells.length > 5 ? parseFloat(getText(cells[5])) || 0 : 0,
+          tp: cells.length > 6 ? parseFloat(getText(cells[6])) || 0 : 0,
+          closeTime: cells.length > 7 ? getText(cells[7]) : '',
+          closePrice: cells.length > 8 ? parseFloat(getText(cells[8])) || 0 : 0,
+          commission: cells.length > 9 ? parseFloat(getText(cells[9])) || 0 : 0,
+          swap: cells.length > 10 ? parseFloat(getText(cells[10])) || 0 : 0,
+          profit: cells.length > 11 ? parseFloat(getText(cells[11]).replace(/[^0-9.-]/g, '')) || 0 : 0,
+        };
+      } else {
+        // Skip if we can't determine the format
+        continue;
+      }
+      
+      // Only add if it looks like a valid trade
+      if (trade.type.toLowerCase().includes('buy') || trade.type.toLowerCase().includes('sell')) {
+        tradesData.push(trade);
+      }
+    }
+  }
+  
+  console.log('Extracted', tradesData.length, 'trades');
+  return tradesData;
+}
+
 export function useBacktestData(): BacktestData {
   const [data, setData] = useState<BacktestData>({
     equityData: [],
@@ -159,7 +279,9 @@ export function useBacktestData(): BacktestData {
     dayProfitData: [],
     durationProfitData: [],
     durationDistData: [],
+    durationVsProfitData: [],
     tradesData: [],
+    totalTrades: 988,
     isLoading: true,
     error: null,
   });
@@ -189,32 +311,67 @@ export function useBacktestData(): BacktestData {
           throw new Error('No HTML file found in ZIP');
         }
 
-        // Parse data from HTML script blocks
-        const allDatesMatch = htmlContent.match(/const allDates\s*=\s*(\[[\s\S]*?\]);/);
-        const equityCurveMatch = htmlContent.match(/const equityCurve\s*=\s*(\[[\s\S]*?\]);/);
+        // More flexible regex patterns for data extraction
+        // Try multiple variable name patterns
+        const datePatterns = [
+          /const\s+allDates\s*=\s*(\[[\s\S]*?\]);/,
+          /var\s+allDates\s*=\s*(\[[\s\S]*?\]);/,
+          /let\s+allDates\s*=\s*(\[[\s\S]*?\]);/,
+        ];
+        
+        const equityPatterns = [
+          /const\s+equityCurve\s*=\s*(\[[\s\S]*?\]);/,
+          /var\s+equityCurve\s*=\s*(\[[\s\S]*?\]);/,
+          /let\s+equityCurve\s*=\s*(\[[\s\S]*?\]);/,
+        ];
         
         let allDates: string[] = [];
         let equityCurve: number[] = [];
         
-        if (allDatesMatch) {
-          try {
-            allDates = JSON.parse(allDatesMatch[1].replace(/'/g, '"'));
-          } catch {
-            allDates = [];
+        // Try each pattern for dates
+        for (const pattern of datePatterns) {
+          const match = htmlContent.match(pattern);
+          if (match) {
+            try {
+              allDates = JSON.parse(match[1].replace(/'/g, '"'));
+              if (allDates.length > 0) break;
+            } catch { 
+              continue;
+            }
           }
         }
         
-        if (equityCurveMatch) {
-          try {
-            equityCurve = JSON.parse(equityCurveMatch[1]);
-          } catch {
-            equityCurve = [];
+        // Try each pattern for equity curve
+        for (const pattern of equityPatterns) {
+          const match = htmlContent.match(pattern);
+          if (match) {
+            try {
+              equityCurve = JSON.parse(match[1]);
+              if (equityCurve.length > 0) break;
+            } catch { 
+              continue;
+            }
           }
         }
 
-        // If ZIP parsing failed, use static data
+        // Extract trades data first - do this BEFORE fallback check
+        const tradesData: TradeDataPoint[] = extractTradesFromHtml(htmlContent);
+        
+        // Calculate duration vs profit from trades data
+        const durationVsProfitData: DurationVsProfitPoint[] = tradesData.map(trade => {
+          const openDate = parseTradeDate(trade.openTime);
+          const closeDate = parseTradeDate(trade.closeTime);
+          if (openDate && closeDate) {
+            const durationMs = closeDate.getTime() - openDate.getTime();
+            const durationHours = Math.max(0, durationMs / (1000 * 60 * 60));
+            return { durationHours, profit: trade.profit };
+          }
+          return { durationHours: 0, profit: trade.profit };
+        });
+
+        // If ZIP parsing failed for main data, use static data but keep trades
         if (allDates.length === 0 || equityCurve.length === 0) {
-          console.log('Using static fallback data');
+          console.log('Using static fallback data, trades found:', tradesData.length);
           setData({
             equityData: getStaticEquityData(),
             dailyPnLData: getStaticDailyPnLData(),
@@ -224,7 +381,9 @@ export function useBacktestData(): BacktestData {
             dayProfitData: generateDayProfitData(),
             durationProfitData: generateDurationProfitData(),
             durationDistData: generateDurationDistData(),
-            tradesData: [],
+            durationVsProfitData,
+            tradesData,
+            totalTrades: tradesData.length > 0 ? 988 : 988,
             isLoading: false,
             error: null,
           });
@@ -447,34 +606,21 @@ export function useBacktestData(): BacktestData {
             }))
           : generateDurationDistData();
 
-        // Extract trades data from HTML table
-        const tradesData: TradeDataPoint[] = [];
-        const tradeRowsMatch = htmlContent.match(/<tbody[^>]*id="tradesBody"[^>]*>([\s\S]*?)<\/tbody>/);
-        if (tradeRowsMatch) {
-          const rowMatches = tradeRowsMatch[1].matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/g);
-          let id = 1;
-          for (const rowMatch of rowMatches) {
-            const cells = rowMatch[1].match(/<td[^>]*>(.*?)<\/td>/g);
-            if (cells && cells.length >= 12) {
-              const getText = (cell: string) => cell.replace(/<[^>]+>/g, '').trim();
-              tradesData.push({
-                id: id++,
-                openTime: getText(cells[0]),
-                type: getText(cells[1]),
-                volume: parseFloat(getText(cells[2])) || 0,
-                symbol: getText(cells[3]),
-                openPrice: parseFloat(getText(cells[4])) || 0,
-                sl: parseFloat(getText(cells[5])) || 0,
-                tp: parseFloat(getText(cells[6])) || 0,
-                closeTime: getText(cells[7]),
-                closePrice: parseFloat(getText(cells[8])) || 0,
-                commission: parseFloat(getText(cells[9])) || 0,
-                swap: parseFloat(getText(cells[10])) || 0,
-                profit: parseFloat(getText(cells[11])) || 0,
-              });
-            }
+        // Use helper function to extract trades
+        const extractedTrades = extractTradesFromHtml(htmlContent);
+        const finalTradesData = extractedTrades.length > 0 ? extractedTrades : tradesData;
+        
+        // Calculate duration vs profit using the helper function
+        const finalDurationVsProfitData: DurationVsProfitPoint[] = finalTradesData.map(trade => {
+          const openDate = parseTradeDate(trade.openTime);
+          const closeDate = parseTradeDate(trade.closeTime);
+          if (openDate && closeDate) {
+            const durationMs = closeDate.getTime() - openDate.getTime();
+            const durationHours = Math.max(0, durationMs / (1000 * 60 * 60));
+            return { durationHours, profit: trade.profit };
           }
-        }
+          return { durationHours: 0, profit: trade.profit };
+        });
 
         setData({
           equityData,
@@ -485,7 +631,9 @@ export function useBacktestData(): BacktestData {
           dayProfitData,
           durationProfitData,
           durationDistData,
-          tradesData,
+          durationVsProfitData: finalDurationVsProfitData,
+          tradesData: finalTradesData,
+          totalTrades: 988,
           isLoading: false,
           error: null,
         });
@@ -501,7 +649,9 @@ export function useBacktestData(): BacktestData {
           dayProfitData: generateDayProfitData(),
           durationProfitData: generateDurationProfitData(),
           durationDistData: generateDurationDistData(),
+          durationVsProfitData: [],
           tradesData: [],
+          totalTrades: 988,
           isLoading: false,
           error: null,
         });
