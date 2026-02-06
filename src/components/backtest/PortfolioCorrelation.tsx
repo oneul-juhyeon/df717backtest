@@ -78,71 +78,83 @@ const PortfolioCorrelation = () => {
       {/* Correlation Matrices */}
       <div className="grid md:grid-cols-2 gap-8">
         {/* Pearson Correlation */}
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <h4 className="font-semibold">Pearson Correlation</h4>
-            <span className="text-sm text-muted-foreground">Avg: 0.20</span>
+        <div className="border border-white/10 rounded-xl overflow-hidden bg-card/30">
+          <div className="px-4 py-3 border-b border-white/10 bg-card/50">
+            <h4 className="font-semibold text-sm">Pearson Correlation</h4>
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse">
-              <thead>
-                <tr className="border-b border-white/10">
-                  <th className="text-left py-2 px-3 text-muted-foreground font-medium text-sm"></th>
-                  <th className="text-center py-2 px-3 text-muted-foreground font-medium text-sm">DFcovenant</th>
-                   <th className="text-center py-2 px-3 text-muted-foreground font-medium text-sm">DFtrust</th>
-                   <th className="text-center py-2 px-3 text-muted-foreground font-medium text-sm">DFpath</th>
-                </tr>
-              </thead>
-              <tbody>
-                {correlationData.pearson.map((row, i) => (
-                  <tr key={i} className="border-b border-white/5">
-                    <td className="py-2 px-3 text-foreground font-medium text-sm">{row[0]}</td>
+          <table className="w-full table-fixed">
+            <thead>
+              <tr className="border-b border-white/10">
+                <th className="w-1/4 py-3 px-2"></th>
+                <th className="w-1/4 py-3 px-2 text-center">
+                  <span className="text-xs font-medium text-primary">DFcovenant</span>
+                </th>
+                <th className="w-1/4 py-3 px-2 text-center">
+                  <span className="text-xs font-medium text-warning">DFtrust</span>
+                </th>
+                <th className="w-1/4 py-3 px-2 text-center">
+                  <span className="text-xs font-medium text-success">DFpath</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {correlationData.pearson.map((row, i) => {
+                const colors = ["text-primary", "text-warning", "text-success"];
+                return (
+                  <tr key={i} className="border-b border-white/5 last:border-0">
+                    <td className="w-1/4 py-4 px-3">
+                      <span className={`text-xs font-medium ${colors[i]}`}>{row[0]}</span>
+                    </td>
                     {row.slice(1).map((cell, j) => (
-                      <td key={j} className="py-2 px-3 text-center">
-                        <span className={`inline-block px-3 py-1 rounded text-sm font-mono ${getCorrelationColor(cell)}`}>
-                          {cell}
-                        </span>
+                      <td key={j} className={`w-1/4 py-4 px-2 text-center ${getCorrelationColor(cell)}`}>
+                        <span className="text-sm font-mono font-medium">{cell}</span>
                       </td>
                     ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
 
         {/* Spearman Correlation */}
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <h4 className="font-semibold">Spearman Correlation</h4>
-            <span className="text-sm text-muted-foreground">Avg: 0.20</span>
+        <div className="border border-white/10 rounded-xl overflow-hidden bg-card/30">
+          <div className="px-4 py-3 border-b border-white/10 bg-card/50">
+            <h4 className="font-semibold text-sm">Spearman Correlation</h4>
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse">
-              <thead>
-                <tr className="border-b border-white/10">
-                  <th className="text-left py-2 px-3 text-muted-foreground font-medium text-sm"></th>
-                  <th className="text-center py-2 px-3 text-muted-foreground font-medium text-sm">DFcovenant</th>
-                   <th className="text-center py-2 px-3 text-muted-foreground font-medium text-sm">DFtrust</th>
-                   <th className="text-center py-2 px-3 text-muted-foreground font-medium text-sm">DFpath</th>
-                </tr>
-              </thead>
-              <tbody>
-                {correlationData.spearman.map((row, i) => (
-                  <tr key={i} className="border-b border-white/5">
-                    <td className="py-2 px-3 text-foreground font-medium text-sm">{row[0]}</td>
+          <table className="w-full table-fixed">
+            <thead>
+              <tr className="border-b border-white/10">
+                <th className="w-1/4 py-3 px-2"></th>
+                <th className="w-1/4 py-3 px-2 text-center">
+                  <span className="text-xs font-medium text-primary">DFcovenant</span>
+                </th>
+                <th className="w-1/4 py-3 px-2 text-center">
+                  <span className="text-xs font-medium text-warning">DFtrust</span>
+                </th>
+                <th className="w-1/4 py-3 px-2 text-center">
+                  <span className="text-xs font-medium text-success">DFpath</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {correlationData.spearman.map((row, i) => {
+                const colors = ["text-primary", "text-warning", "text-success"];
+                return (
+                  <tr key={i} className="border-b border-white/5 last:border-0">
+                    <td className="w-1/4 py-4 px-3">
+                      <span className={`text-xs font-medium ${colors[i]}`}>{row[0]}</span>
+                    </td>
                     {row.slice(1).map((cell, j) => (
-                      <td key={j} className="py-2 px-3 text-center">
-                        <span className={`inline-block px-3 py-1 rounded text-sm font-mono ${getCorrelationColor(cell)}`}>
-                          {cell}
-                        </span>
+                      <td key={j} className={`w-1/4 py-4 px-2 text-center ${getCorrelationColor(cell)}`}>
+                        <span className="text-sm font-mono font-medium">{cell}</span>
                       </td>
                     ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       </div>
 
