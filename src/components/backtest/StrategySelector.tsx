@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronDown, Check } from "lucide-react";
 import {
@@ -17,6 +18,7 @@ interface StrategySelectorProps {
 
 const StrategySelector = ({ currentStrategy, context }: StrategySelectorProps) => {
   const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
   const current = getStrategyById(currentStrategy);
 
   const handleSelect = (strategyId: string) => {
@@ -29,18 +31,23 @@ const StrategySelector = ({ currentStrategy, context }: StrategySelectorProps) =
   };
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
           className="gap-2 bg-muted/50 hover:bg-muted px-3 py-1.5 h-auto"
         >
           <span className="font-medium">{current?.name || currentStrategy}</span>
-          <ChevronDown className="h-4 w-4 opacity-50" />
+          <ChevronDown 
+            className={cn(
+              "h-4 w-4 opacity-50 transition-transform duration-200",
+              open && "rotate-180"
+            )} 
+          />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent 
-        align="end" 
+        align="start" 
         className="w-56 bg-popover border border-border z-50"
       >
         {strategies.map((strategy) => (
