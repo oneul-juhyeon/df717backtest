@@ -156,9 +156,27 @@ function generateDurationDistData(): DurationDistDataPoint[] {
   }));
 }
 
-// Parse trade date strings like "2024.01.15 10:30:00"
+// Parse trade date strings like "May 31, 21:00" or "2024.01.15 10:30:00"
 function parseTradeDate(dateStr: string): Date | null {
   if (!dateStr) return null;
+  
+  // Handle format "Month Day, HH:MM" (e.g., "May 31, 21:00")
+  const monthDayMatch = dateStr.match(/^(\w+)\s+(\d+),?\s+(\d+):(\d+)/);
+  if (monthDayMatch) {
+    const months: { [key: string]: number } = {
+      'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Jun': 5,
+      'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11
+    };
+    const month = months[monthDayMatch[1]];
+    if (month !== undefined) {
+      const day = parseInt(monthDayMatch[2]);
+      const hour = parseInt(monthDayMatch[3]);
+      const minute = parseInt(monthDayMatch[4]);
+      // Use 2024 as default year for relative dates
+      return new Date(2024, month, day, hour, minute);
+    }
+  }
+  
   // Handle format "YYYY.MM.DD HH:MM:SS"
   const cleaned = dateStr.replace(/\./g, '-');
   const d = new Date(cleaned);
