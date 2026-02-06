@@ -394,7 +394,7 @@ const BacktestReport = () => {
       <footer className="border-t border-border py-8">
         <div className="container mx-auto px-6 text-center">
           <p className="text-sm text-muted-foreground">
-            © 2024 DF717. Professional Expert Advisors for MetaTrader 5.
+            © 2025 DF717. Past performance is not indicative of future results. Trading involves substantial risk. All analytics are provided for educational purposes only.
           </p>
         </div>
       </footer>
