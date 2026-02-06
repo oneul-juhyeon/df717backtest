@@ -41,11 +41,11 @@ const DFtrustReport = () => {
         <div className="container mx-auto px-6">
           <div className="flex items-center justify-between mb-4">
             <Link 
-              to="/" 
+              to="/dftrust" 
               className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
-              Back to Overview
+              Back to DFtrust
             </Link>
             <StrategyNav currentStrategy="dftrust" />
           </div>

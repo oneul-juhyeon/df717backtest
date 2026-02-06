@@ -6,7 +6,7 @@ interface StrategyNavProps {
 }
 
 const strategies = [
-  { id: "dfcovenant", name: "DFcovenant", path: "/backtest-report" },
+  { id: "dfcovenant", name: "DFcovenant", path: "/" },
   { id: "dftrust", name: "DFtrust", path: "/dftrust" },
 ];
 
