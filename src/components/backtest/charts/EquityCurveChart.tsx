@@ -1,6 +1,18 @@
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area } from "recharts";
+import { useRef, useState } from "react";
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  ResponsiveContainer,
+  Tooltip,
+} from "recharts";
 import { equityCurveData } from "@/data/backtestData";
-import { useState } from "react";
+
+interface TooltipPayload {
+  date: string;
+  equity: number;
+}
 
 const formatCurrency = (value: number) => {
   return new Intl.NumberFormat('en-US', {
@@ -12,43 +24,60 @@ const formatCurrency = (value: number) => {
 };
 
 const EquityCurveChart = () => {
+  const chartRef = useRef<HTMLDivElement>(null);
   const [tooltipData, setTooltipData] = useState<{
     x: number;
     y: number;
-    date: string;
-    equity: number;
-    chartWidth: number;
-    chartHeight: number;
+    payload: TooltipPayload;
   } | null>(null);
 
-  const handleMouseMove = (state: any) => {
-    if (state.isTooltipActive && state.activePayload && state.activePayload.length > 0) {
-      const data = state.activePayload[0].payload;
-      const xCoord = state.activeCoordinate?.x || 0;
-      const chartWidth = state.chartWidth || 1000;
-      const chartHeight = state.chartHeight || 380;
-      
-      setTooltipData({
-        x: xCoord,
-        y: state.activeCoordinate?.y || 0,
-        date: data.date,
-        equity: data.equity,
-        chartWidth,
-        chartHeight,
-      });
-    } else {
-      setTooltipData(null);
+  const maxEquity = Math.max(...equityCurveData.map((d) => d.equity));
+  const yAxisMax = Math.ceil(maxEquity / 100000) * 100000;
+
+  const handleMouseMove = (e: any) => {
+    if (e.activeTooltipIndex !== undefined && e.activePayload?.[0]) {
+      const payload = e.activePayload[0].payload as TooltipPayload;
+      const chartBounds = chartRef.current?.getBoundingClientRect();
+      if (chartBounds && e.chartX !== undefined && e.chartY !== undefined) {
+        const tooltipWidth = 220;
+        const tooltipHeight = 64;
+        const padding = 12;
+
+        let x = e.chartX + 70;
+        let y = e.chartY;
+
+        const rightEdge = chartBounds.width - 60;
+        if (x + tooltipWidth > rightEdge) {
+          x = e.chartX - tooltipWidth + 40;
+        }
+
+        x = Math.max(padding, Math.min(x, chartBounds.width - tooltipWidth - padding));
+        y = Math.max(padding, Math.min(y, chartBounds.height - tooltipHeight - padding));
+
+        setTooltipData({ x, y, payload });
+      }
     }
   };
 
+  const handleMouseLeave = () => {
+    setTooltipData(null);
+  };
+
+  const formatYAxisValue = (value: number) => {
+    if (value >= 1000) {
+      return `€${(value / 1000).toFixed(0)}k`;
+    }
+    return `€${value}`;
+  };
+
   return (
-    <div className="w-full h-[380px] relative">
+    <div ref={chartRef} className="relative h-[380px] w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart
+        <AreaChart
           data={equityCurveData}
           margin={{ top: 10, right: 30, left: 10, bottom: 10 }}
           onMouseMove={handleMouseMove}
-          onMouseLeave={() => setTooltipData(null)}
+          onMouseLeave={handleMouseLeave}
         >
           <defs>
             <linearGradient id="equityAreaGradient" x1="0" y1="0" x2="0" y2="1">
@@ -56,99 +85,59 @@ const EquityCurveChart = () => {
               <stop offset="100%" stopColor="#4fd1c5" stopOpacity={0.02} />
             </linearGradient>
           </defs>
-          <CartesianGrid 
-            strokeDasharray="0"
-            stroke="#1a2535"
-            strokeOpacity={0.4}
-            vertical={true}
-            horizontal={true}
-          />
-          <XAxis 
-            dataKey="date" 
-            stroke="transparent"
-            fontSize={11}
-            tickLine={false}
+          <XAxis
+            dataKey="date"
             axisLine={false}
+            tickLine={false}
+            tick={{ fill: "#6b7280", fontSize: 11 }}
             interval={14}
-            tick={{ fill: '#4a5568' }}
           />
-          <YAxis 
-            tickFormatter={(value) => `€${value.toLocaleString()}`}
-            stroke="transparent"
-            fontSize={11}
-            tickLine={false}
+          <YAxis
+            domain={[0, yAxisMax]}
             axisLine={false}
-            tick={{ fill: '#4a5568' }}
-            width={40}
+            tickLine={false}
+            tick={{ fill: "#6b7280", fontSize: 11 }}
+            tickFormatter={formatYAxisValue}
+            width={50}
           />
           <Tooltip content={() => null} cursor={false} />
           <Area
             type="monotone"
             dataKey="equity"
-            stroke="none"
-            fill="url(#equityAreaGradient)"
-          />
-          <Line
-            type="monotone"
-            dataKey="equity"
             stroke="#4fd1c5"
             strokeWidth={2.4}
+            fill="url(#equityAreaGradient)"
             dot={false}
             activeDot={{
               r: 5,
               fill: "transparent",
               stroke: "#4fd1c5",
               strokeWidth: 1.5,
-              className: "animate-scale-in"
             }}
           />
-        </LineChart>
+        </AreaChart>
       </ResponsiveContainer>
-      
-      {tooltipData && (() => {
-        const TOOLTIP_W = 220;
-        const TOOLTIP_H = 64;
-        const PADDING = 8;
-        const OFFSET_X = 14;
-        const OFFSET_Y = 12;
 
-        let sideRight = tooltipData.x < tooltipData.chartWidth / 2;
-        if (sideRight && tooltipData.x + OFFSET_X + TOOLTIP_W > tooltipData.chartWidth - PADDING) {
-          sideRight = false;
-        }
-        if (!sideRight && tooltipData.x - OFFSET_X - TOOLTIP_W < PADDING) {
-          sideRight = true;
-        }
-
-        let top = tooltipData.y + OFFSET_Y;
-        if (top + TOOLTIP_H > tooltipData.chartHeight - PADDING) {
-          top = tooltipData.y - OFFSET_Y - TOOLTIP_H;
-        }
-
-        const left = sideRight ? tooltipData.x + OFFSET_X : tooltipData.x - OFFSET_X;
-        const transform = sideRight ? 'translateY(0)' : 'translateX(-100%) translateY(0)';
-
-        return (
-        <div 
-          className="absolute pointer-events-none bg-[#0f1a24]/95 border border-[#1e2d3d] rounded px-3 py-2 shadow-lg backdrop-blur-sm z-10"
+      {tooltipData && (
+        <div
+          className="absolute pointer-events-none z-50"
           style={{
-            left,
-            top,
-            transform,
-            width: TOOLTIP_W,
-             // Move immediately with the cursor (no smoothing/lag)
-             willChange: 'left, top, transform',
+            left: tooltipData.x,
+            top: tooltipData.y,
+            willChange: "transform",
+            transform: "translateZ(0)",
           }}
         >
-          <p className="text-xs text-foreground font-medium mb-1.5">{tooltipData.date}</p>
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-sm bg-[#4fd1c5]" />
-            <span className="text-xs text-muted-foreground">DFcovenant:</span>
-            <span className="text-xs font-mono text-foreground">{formatCurrency(tooltipData.equity)}</span>
+          <div className="bg-[#0f1a24]/95 backdrop-blur-sm border border-[#1e2d3d] rounded-lg px-3 py-2 shadow-xl min-w-[200px]">
+            <p className="text-xs text-foreground font-medium mb-1.5">{tooltipData.payload.date}</p>
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-sm bg-[#4fd1c5]" />
+              <span className="text-xs text-muted-foreground">DFcovenant:</span>
+              <span className="text-xs font-mono text-foreground">{formatCurrency(tooltipData.payload.equity)}</span>
+            </div>
           </div>
         </div>
-        );
-      })()}
+      )}
     </div>
   );
 };
