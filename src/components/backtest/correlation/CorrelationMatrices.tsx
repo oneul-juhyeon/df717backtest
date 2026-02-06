@@ -37,12 +37,12 @@ const MatrixTable = ({ title, data, colorFn }: MatrixTableProps) => (
     <div className="px-4 py-3 border-b border-white/10 bg-card/50">
       <h4 className="font-semibold text-sm">{title}</h4>
     </div>
-    <table className="w-full">
+    <table className="w-full table-fixed">
       <thead>
         <tr className="border-b border-white/10">
-          <th className="w-1/4"></th>
+          <th className="w-1/4 py-3 px-2"></th>
           {strategyLabels.map((label, i) => (
-            <th key={i} className="py-3 px-2 text-center">
+            <th key={i} className="w-1/4 py-3 px-2 text-center">
               <span className={`text-xs font-medium ${strategyColors[i]}`}>{label}</span>
             </th>
           ))}
@@ -51,11 +51,11 @@ const MatrixTable = ({ title, data, colorFn }: MatrixTableProps) => (
       <tbody>
         {data.map((row, i) => (
           <tr key={i} className="border-b border-white/5 last:border-0">
-            <td className="py-3 px-3">
+            <td className="w-1/4 py-4 px-3">
               <span className={`text-xs font-medium ${strategyColors[i]}`}>{strategyLabels[i]}</span>
             </td>
             {row.slice(1).map((cell, j) => (
-              <td key={j} className={`py-3 px-2 text-center ${colorFn(cell)}`}>
+              <td key={j} className={`w-1/4 py-4 px-2 text-center ${colorFn(cell)}`}>
                 <span className="text-sm font-mono font-medium">{cell}</span>
               </td>
             ))}
