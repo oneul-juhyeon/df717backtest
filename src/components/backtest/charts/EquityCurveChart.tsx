@@ -32,6 +32,8 @@ const EquityCurveChart = () => {
   } | null>(null);
 
   const maxEquity = Math.max(...equityCurveData.map((d) => d.equity));
+  const minEquity = Math.min(...equityCurveData.map((d) => d.equity));
+  const yAxisMin = Math.floor(minEquity / 10000) * 10000;
   const yAxisMax = Math.ceil(maxEquity / 100000) * 100000;
 
   const handleMouseMove = (e: any) => {
@@ -93,7 +95,7 @@ const EquityCurveChart = () => {
             interval={14}
           />
           <YAxis
-            domain={[0, yAxisMax]}
+            domain={[yAxisMin, yAxisMax]}
             axisLine={false}
             tickLine={false}
             tick={{ fill: "#6b7280", fontSize: 11 }}
