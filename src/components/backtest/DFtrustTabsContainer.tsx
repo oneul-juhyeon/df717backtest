@@ -1,40 +1,16 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { TrendingUp, FileText, GitBranch } from "lucide-react";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import DFtrustPerformanceMetrics from "./DFtrustPerformanceMetrics";
 import DFtrustRiskMetrics from "./DFtrustRiskMetrics";
 import MethodologySection from "./MethodologySection";
 import PortfolioCorrelation from "./PortfolioCorrelation";
+import StrategyTabsNav from "./StrategyTabsNav";
 
 const DFtrustTabsContainer = () => {
   return (
     <section className="py-12">
-      <div className="container mx-auto px-6">
+      <div className="container mx-auto px-4 sm:px-6">
         <Tabs defaultValue="backtest" className="w-full">
-          <div className="flex justify-center mb-12">
-            <TabsList className="bg-card border border-border p-1.5 rounded-lg h-auto">
-              <TabsTrigger 
-                value="backtest" 
-                className="flex items-center gap-2 px-6 py-2.5 data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-md transition-all"
-              >
-                <TrendingUp className="w-4 h-4" />
-                Backtest Results
-              </TabsTrigger>
-              <TabsTrigger 
-                value="methodology" 
-                className="flex items-center gap-2 px-6 py-2.5 data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-md transition-all"
-              >
-                <FileText className="w-4 h-4" />
-                Methodology
-              </TabsTrigger>
-              <TabsTrigger 
-                value="correlation" 
-                className="flex items-center gap-2 px-6 py-2.5 data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-md transition-all"
-              >
-                <GitBranch className="w-4 h-4" />
-                Portfolio Correlation
-              </TabsTrigger>
-            </TabsList>
-          </div>
+          <StrategyTabsNav />
 
           <div className="max-w-5xl mx-auto">
             <TabsContent value="backtest" className="mt-0 animate-fade-in">
