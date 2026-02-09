@@ -221,38 +221,50 @@ function transformStrategyData(strategyId: string, raw: RawStrategyData): Transf
     .map(([range, count]) => ({ range, count }))
     .sort((a, b) => parseFloat(a.range) - parseFloat(b.range));
 
-  // Duration distribution from duration_buckets or derived from trades
+  // Duration distribution - derive from trade-level duration_hours
   let durationDistData: DurationDistDataPoint[] = [];
-  if (raw.duration_buckets && Object.keys(raw.duration_buckets).length > 0) {
+  const durationVsProfitData: DurationVsProfitPoint[] = [];
+
+  const tradesWithDuration = trades.filter(t => t.duration_hours != null);
+  if (tradesWithDuration.length > 0) {
+    // Build duration buckets from actual trade data
+    const buckets: Record<string, { count: number; profit: number }> = {};
+    for (const t of tradesWithDuration) {
+      const hours = t.duration_hours!;
+      let label: string;
+      if (hours < 1) label = '0-1h';
+      else if (hours < 2) label = '1-2h';
+      else if (hours < 4) label = '2-4h';
+      else if (hours < 8) label = '4-8h';
+      else if (hours < 16) label = '8-16h';
+      else if (hours < 24) label = '16-24h';
+      else if (hours < 48) label = '24-48h';
+      else if (hours < 72) label = '48-72h';
+      else label = '72h+';
+
+      if (!buckets[label]) buckets[label] = { count: 0, profit: 0 };
+      buckets[label].count++;
+      buckets[label].profit += t.profit;
+
+      // Scatter data
+      durationVsProfitData.push({ durationHours: hours, profit: t.profit });
+    }
+
+    const order = ['0-1h','1-2h','2-4h','4-8h','8-16h','16-24h','24-48h','48-72h','72h+'];
+    durationDistData = order
+      .filter(k => buckets[k])
+      .map(k => ({ range: k, count: buckets[k].count, profit: buckets[k].profit }));
+  } else if (raw.duration_buckets && Object.keys(raw.duration_buckets).length > 0) {
+    // Fallback to pre-calculated buckets
     durationDistData = Object.entries(raw.duration_buckets)
       .map(([range, { count, profit }]) => ({ range, count, profit }))
-      .sort((a, b) => {
-        const numA = parseFloat(a.range.replace(/[^0-9.-]/g, ''));
-        const numB = parseFloat(b.range.replace(/[^0-9.-]/g, ''));
-        return numA - numB;
-      });
-  }
-
-  // Duration vs Profit scatter
-  const durationVsProfitData: DurationVsProfitPoint[] = [];
-  if (raw.duration_buckets && Object.keys(raw.duration_buckets).length > 0) {
-    // Generate scatter points from bucket midpoints
-    Object.entries(raw.duration_buckets).forEach(([range, { count, profit }]) => {
-      const midHours = parseFloat(range.replace(/[^0-9.]/g, '')) || 0;
-      const avgProfit = count > 0 ? profit / count : 0;
-      for (let i = 0; i < Math.min(count, 20); i++) {
-        durationVsProfitData.push({
-          durationHours: midHours + (Math.random() - 0.5) * 2,
-          profit: avgProfit + (Math.random() - 0.5) * Math.abs(avgProfit) * 0.5,
-        });
-      }
-    });
+      .sort((a, b) => parseFloat(a.range.replace(/[^0-9.-]/g, '')) - parseFloat(b.range.replace(/[^0-9.-]/g, '')));
   }
 
   // Trades Data
   const tradesData: TradeDataPoint[] = trades.map((trade, i) => ({
     id: i + 1,
-    openTime: '',
+    openTime: trade.open_time || '',
     type: trade.type.charAt(0).toUpperCase() + trade.type.slice(1),
     volume: trade.volume,
     symbol: trade.symbol,

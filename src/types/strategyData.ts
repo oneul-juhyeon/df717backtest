@@ -15,6 +15,11 @@ export interface RawTrade {
   net_profit: number;
   balance: number;
   comment: string;
+  open_time?: string;
+  duration_seconds?: number;
+  duration_minutes?: number;
+  duration_hours?: number;
+  duration_days?: number;
 }
 
 export interface RawStrategyData {
