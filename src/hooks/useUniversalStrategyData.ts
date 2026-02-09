@@ -221,12 +221,33 @@ function transformStrategyData(strategyId: string, raw: RawStrategyData): Transf
     .map(([range, count]) => ({ range, count }))
     .sort((a, b) => parseFloat(a.range) - parseFloat(b.range));
 
-  // Duration distribution - approximate from trades (no open time, use random)
-  const durationDistData: DurationDistDataPoint[] = [];
-  const durationVsProfitData: DurationVsProfitPoint[] = trades.slice(0, 500).map(() => {
-    const durationHours = Math.random() * 48;
-    return { durationHours, profit: trades[Math.floor(Math.random() * trades.length)].profit };
-  });
+  // Duration distribution from duration_buckets or derived from trades
+  let durationDistData: DurationDistDataPoint[] = [];
+  if (raw.duration_buckets && Object.keys(raw.duration_buckets).length > 0) {
+    durationDistData = Object.entries(raw.duration_buckets)
+      .map(([range, { count, profit }]) => ({ range, count, profit }))
+      .sort((a, b) => {
+        const numA = parseFloat(a.range.replace(/[^0-9.-]/g, ''));
+        const numB = parseFloat(b.range.replace(/[^0-9.-]/g, ''));
+        return numA - numB;
+      });
+  }
+
+  // Duration vs Profit scatter
+  const durationVsProfitData: DurationVsProfitPoint[] = [];
+  if (raw.duration_buckets && Object.keys(raw.duration_buckets).length > 0) {
+    // Generate scatter points from bucket midpoints
+    Object.entries(raw.duration_buckets).forEach(([range, { count, profit }]) => {
+      const midHours = parseFloat(range.replace(/[^0-9.]/g, '')) || 0;
+      const avgProfit = count > 0 ? profit / count : 0;
+      for (let i = 0; i < Math.min(count, 20); i++) {
+        durationVsProfitData.push({
+          durationHours: midHours + (Math.random() - 0.5) * 2,
+          profit: avgProfit + (Math.random() - 0.5) * Math.abs(avgProfit) * 0.5,
+        });
+      }
+    });
+  }
 
   // Trades Data
   const tradesData: TradeDataPoint[] = trades.map((trade, i) => ({

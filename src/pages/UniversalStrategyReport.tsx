@@ -85,7 +85,7 @@ const UniversalStrategyReport = () => {
           <div className="flex flex-wrap justify-center gap-4 md:gap-8 text-sm">
             <div className="text-center">
               <span className="text-muted-foreground text-xs block">EA</span>
-              <span className="font-medium">EA {strategyConfig?.name || data.reportInfo.ea}</span>
+              <span className="font-medium">{strategyConfig?.name || data.reportInfo.ea}</span>
             </div>
             <div className="hidden md:block w-px h-8 bg-border" />
             <div className="text-center">
