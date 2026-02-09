@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import {
   AreaChart,
   Area,
+  CartesianGrid,
   XAxis,
   YAxis,
   ResponsiveContainer,
@@ -118,6 +119,13 @@ const EquityCurveChart = ({ strategyId }: EquityCurveChartProps) => {
               <stop offset="100%" stopColor="#4fd1c5" stopOpacity={0.02} />
             </linearGradient>
           </defs>
+          <CartesianGrid 
+            strokeDasharray="0"
+            stroke="#1a2535"
+            strokeOpacity={0.4}
+            vertical={true}
+            horizontal={true}
+          />
           <XAxis
             dataKey="date"
             axisLine={false}
