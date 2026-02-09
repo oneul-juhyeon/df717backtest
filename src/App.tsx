@@ -10,7 +10,6 @@ import UniversalStrategyLanding from "./pages/UniversalStrategyLanding";
 import UniversalStrategyReport from "./pages/UniversalStrategyReport";
 import CorrelationReport from "./pages/CorrelationReport";
 import NotFound from "./pages/NotFound";
-import { jsonStrategyIds } from "./config/strategies";
 
 const queryClient = new QueryClient();
 
@@ -28,25 +27,12 @@ const App = () => (
           {/* DFtrust - 기존 랜딩 페이지 유지 */}
           <Route path="/dftrust" element={<DFtrustIndex />} />
           
-          {/* 모든 JSON 기반 전략의 랜딩 페이지 및 상세 리포트 - 동적 라우트 */}
-          {jsonStrategyIds.filter(id => id !== 'dftrust').map(id => (
-            <Route 
-              key={`landing-${id}`} 
-              path={`/${id}`} 
-              element={<UniversalStrategyLanding />} 
-            />
-          ))}
-          
-          {jsonStrategyIds.map(id => (
-            <Route 
-              key={`report-${id}`} 
-              path={`/${id}/backtest-report`} 
-              element={<UniversalStrategyReport />} 
-            />
-          ))}
-          
           {/* Correlation Report */}
           <Route path="/correlation-report" element={<CorrelationReport />} />
+          
+          {/* 동적 전략 라우트 - 모든 JSON 기반 전략 */}
+          <Route path="/:strategyId" element={<UniversalStrategyLanding />} />
+          <Route path="/:strategyId/backtest-report" element={<UniversalStrategyReport />} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
