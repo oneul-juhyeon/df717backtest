@@ -142,7 +142,7 @@ const CorrelationEquityChart = ({ showCombined = false }: CorrelationEquityChart
              tick={{ fill: '#4a5568' }}
           />
           <YAxis 
-            tickFormatter={(value) => `€${(value / 1000).toFixed(0)}K`}
+            tickFormatter={(value) => `${value.toFixed(0)}%`}
              stroke="transparent"
              fontSize={11}
             tickLine={false}
@@ -288,7 +288,7 @@ const CorrelationEquityChart = ({ showCombined = false }: CorrelationEquityChart
                      style={{ backgroundColor: entry.color }}
                    />
                    <span className="text-xs text-muted-foreground">{entry.name}:</span>
-                   <span className="text-xs font-mono text-foreground">{formatCurrency(entry.value)}</span>
+                   <span className="text-xs font-mono text-foreground">{entry.value.toFixed(1)}%</span>
                  </div>
                ))}
              </div>
