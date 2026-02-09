@@ -2,22 +2,15 @@ import { TrendingUp, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import MetricCard from "./MetricCard";
 import EquityCurveChart from "./charts/EquityCurveChart";
+import { getStrategyConfig } from "@/data/strategies";
 
-const performanceMetrics = [
-  { value: "€722,988.07", label: "TOTAL NET PROFIT", highlight: true },
-  { value: "3.31", label: "PROFIT FACTOR", highlight: false },
-  { value: "988", label: "TOTAL TRADES", highlight: false },
-  { value: "66.0%", label: "WIN RATE", highlight: false },
-];
+interface PerformanceMetricsProps {
+  strategyId: string;
+}
 
-const secondaryMetrics = [
-  { value: "€731.77", label: "EXPECTANCY", highlight: true },
-  { value: "22.24", label: "RECOVERY FACTOR", highlight: false },
-  { value: "10.00", label: "SHARPE RATIO", highlight: false },
-  { value: "8.17", label: "SORTINO RATIO", highlight: false },
-];
+const PerformanceMetrics = ({ strategyId }: PerformanceMetricsProps) => {
+  const config = getStrategyConfig(strategyId);
 
-const PerformanceMetrics = () => {
   return (
     <div className="space-y-8">
       {/* Section header */}
@@ -30,7 +23,7 @@ const PerformanceMetrics = () => {
 
       {/* Primary metrics grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {performanceMetrics.map((metric, index) => (
+        {config.performanceMetrics.primary.map((metric, index) => (
           <MetricCard 
             key={index}
             value={metric.value}
@@ -42,7 +35,7 @@ const PerformanceMetrics = () => {
 
       {/* Secondary metrics grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {secondaryMetrics.map((metric, index) => (
+        {config.performanceMetrics.secondary.map((metric, index) => (
           <MetricCard 
             key={index}
             value={metric.value}
@@ -55,15 +48,15 @@ const PerformanceMetrics = () => {
       {/* Equity curve with interactive chart */}
       <div className="bg-[#0a1018] rounded-xl p-6 border border-[#1a2535]">
         <h3 className="text-muted-foreground text-sm mb-4">
-          Equity Curve in EUR (2016-2026) — €10,000 → €732,988
+          {config.equityChartTitle}
         </h3>
-          <EquityCurveChart />
+        <EquityCurveChart strategyId={strategyId} />
       </div>
 
       {/* View full report link */}
       <div className="flex justify-center pt-4">
         <Link 
-          to="/backtest-report"
+          to={config.reportPath}
           className="inline-flex items-center gap-2 px-6 py-3 bg-primary/10 border border-primary/30 rounded-lg text-primary hover:bg-primary/20 transition-colors"
         >
           View Full Backtest Report

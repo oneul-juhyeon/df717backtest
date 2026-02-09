@@ -27,16 +27,10 @@ export const strategies: Strategy[] = [
     symbol: "XAUUSD",
     period: "H1",
   },
-  // 향후 추가 전략들...
-  // {
-  //   id: "dfpath",
-  //   name: "DFpath",
-  //   description: "Momentum Trading Strategy",
-  //   landingPath: "/dfpath",
-  //   reportPath: "/dfpath/backtest-report",
-  //   symbol: "XAUUSD",
-  //   period: "M15",
-  // },
+  // 새 전략 추가 시:
+  // 1. 여기에 메타데이터 추가
+  // 2. src/data/strategies/[id].ts 에 데이터 파일 생성
+  // 3. src/data/strategies/index.ts 에서 import 및 등록
 ];
 
 export const getStrategyById = (id: string): Strategy | undefined => {
