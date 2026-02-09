@@ -19,9 +19,8 @@ const TabsContainer = ({ strategyId }: TabsContainerProps) => {
     <section className="py-12">
       <div className="container mx-auto px-4 sm:px-6">
         <Tabs defaultValue="backtest" className="w-full">
-          <StrategyTabsNav />
-
           <div className="max-w-5xl mx-auto">
+            <StrategyTabsNav />
             <TabsContent value="backtest" className="mt-0 animate-fade-in">
               <div className="space-y-12">
                 {useJsonData ? (
