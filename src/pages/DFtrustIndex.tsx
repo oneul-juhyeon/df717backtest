@@ -1,14 +1,16 @@
 import Header from "@/components/backtest/Header";
-import DFtrustHeroSection from "@/components/backtest/DFtrustHeroSection";
-import DFtrustTabsContainer from "@/components/backtest/DFtrustTabsContainer";
+import HeroSection from "@/components/backtest/HeroSection";
+import TabsContainer from "@/components/backtest/TabsContainer";
 
 const DFtrustIndex = () => {
+  const strategyId = "dftrust";
+  
   return (
     <div className="min-h-screen bg-background">
-      <Header currentStrategy="dftrust" />
+      <Header currentStrategy={strategyId} />
       <main>
-        <DFtrustHeroSection />
-        <DFtrustTabsContainer />
+        <HeroSection strategyId={strategyId} />
+        <TabsContainer strategyId={strategyId} />
       </main>
       
       {/* Footer */}

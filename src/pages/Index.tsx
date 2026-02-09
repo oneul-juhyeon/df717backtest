@@ -3,12 +3,14 @@ import HeroSection from "@/components/backtest/HeroSection";
 import TabsContainer from "@/components/backtest/TabsContainer";
 
 const Index = () => {
+  const strategyId = "dfcovenant";
+  
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      <Header currentStrategy={strategyId} />
       <main>
-        <HeroSection />
-        <TabsContainer />
+        <HeroSection strategyId={strategyId} />
+        <TabsContainer strategyId={strategyId} />
       </main>
       
       {/* Footer */}
