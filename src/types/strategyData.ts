@@ -59,13 +59,13 @@ export interface RawStrategyData {
   total_commission: number;
   total_swap: number;
   trades: RawTrade[];
-  daily_balance: Record<string, number>;
-  hourly_profit: Record<string, number>;
-  dow_profit: Record<string, number>;
-  duration_buckets: Record<string, { count: number; profit: number }>;
-  profit_distribution: Record<string, number>;
-  yearly_monthly_profit: Record<string, Record<string, number>>;
-  yearly_monthly_trades: Record<string, Record<string, number>>;
+  daily_balance?: Record<string, number>;
+  hourly_profit?: Record<string, number>;
+  dow_profit?: Record<string, number>;
+  duration_buckets?: Record<string, { count: number; profit: number }>;
+  profit_distribution?: Record<string, number>;
+  yearly_monthly_profit?: Record<string, Record<string, number>>;
+  yearly_monthly_trades?: Record<string, Record<string, number>>;
 }
 
 export interface AllStrategiesJson {

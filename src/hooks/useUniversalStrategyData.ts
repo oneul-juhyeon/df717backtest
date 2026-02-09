@@ -49,7 +49,6 @@ const DOW_MAP: Record<number, string> = {
 };
 
 function transformStrategyData(strategyId: string, raw: RawStrategyData): TransformedStrategyData {
-  const currency = raw.currency === 'EUR' ? '€' : '$';
   const currencySymbol = raw.currency === 'EUR' ? '€' : '$';
 
   // Report Info
@@ -86,7 +85,7 @@ function transformStrategyData(strategyId: string, raw: RawStrategyData): Transf
       winRate: raw.long_won,
       profit: raw.long_profit,
       avgProfit: raw.long_trades > 0 ? raw.long_profit / raw.long_trades : 0,
-      best: raw.best_trade, // Approximation
+      best: raw.best_trade,
       worst: raw.worst_trade,
       volume: raw.total_volume / 2,
     },
@@ -124,7 +123,7 @@ function transformStrategyData(strategyId: string, raw: RawStrategyData): Transf
       winRate: raw.win_rate,
       avgWin: raw.avg_win,
       avgLoss: raw.avg_loss,
-      maxWinStreak: 0, // Not available in data
+      maxWinStreak: 0,
       maxLossStreak: 0,
     },
     drawdown: {
@@ -140,11 +139,20 @@ function transformStrategyData(strategyId: string, raw: RawStrategyData): Transf
     },
   };
 
-  // Equity Data from daily_balance
-  const sortedDates = Object.keys(raw.daily_balance).sort();
+  // === Derive all chart data from trades array ===
+  const trades = raw.trades || [];
+
+  // Build daily_balance from trades (last balance per close_date)
+  const dailyBalanceMap: Record<string, number> = {};
+  for (const t of trades) {
+    dailyBalanceMap[t.close_date] = t.balance;
+  }
+  const sortedDates = Object.keys(dailyBalanceMap).sort();
+
+  // Equity Data
   const equityData: EquityDataPoint[] = sortedDates.map((date, i) => {
-    const equity = raw.daily_balance[date];
-    const prevEquity = i > 0 ? raw.daily_balance[sortedDates[i - 1]] : raw.deposit;
+    const equity = dailyBalanceMap[date];
+    const prevEquity = i > 0 ? dailyBalanceMap[sortedDates[i - 1]] : raw.deposit;
     const pnl = equity - prevEquity;
     const change = prevEquity > 0 ? (pnl / prevEquity) * 100 : 0;
     return { date, equity, pnl, change };
@@ -152,72 +160,78 @@ function transformStrategyData(strategyId: string, raw: RawStrategyData): Transf
 
   // Daily P&L Data
   const dailyPnLData: DailyPnLDataPoint[] = sortedDates.map((date, i) => {
-    const equity = raw.daily_balance[date];
-    const prevEquity = i > 0 ? raw.daily_balance[sortedDates[i - 1]] : raw.deposit;
+    const equity = dailyBalanceMap[date];
+    const prevEquity = i > 0 ? dailyBalanceMap[sortedDates[i - 1]] : raw.deposit;
     return { date, pnl: equity - prevEquity };
   });
 
-  // Monthly Returns Data from yearly_monthly_profit
+  // Hourly profit from trades
+  const hourlyProfitMap: Record<number, number> = {};
+  for (const t of trades) {
+    hourlyProfitMap[t.close_hour] = (hourlyProfitMap[t.close_hour] || 0) + t.profit;
+  }
+  const hourProfitData: HourProfitDataPoint[] = Array.from({ length: 24 }, (_, hour) => ({
+    hour,
+    profit: hourlyProfitMap[hour] || 0,
+  }));
+
+  // Day of week profit from trades
+  const dowProfitMap: Record<number, number> = {};
+  for (const t of trades) {
+    dowProfitMap[t.close_dow] = (dowProfitMap[t.close_dow] || 0) + t.profit;
+  }
+  const dayProfitData: DayProfitDataPoint[] = DAY_NAMES.slice(0, 5).map((day, index) => ({
+    day,
+    profit: dowProfitMap[index] || 0,
+  }));
+
+  // Monthly profit from trades
+  const yearlyMonthlyProfit: Record<string, Record<string, number>> = {};
+  const yearlyMonthlyTrades: Record<string, Record<string, number>> = {};
+  for (const t of trades) {
+    const [year, month] = t.close_date.split('-');
+    if (!yearlyMonthlyProfit[year]) yearlyMonthlyProfit[year] = {};
+    if (!yearlyMonthlyTrades[year]) yearlyMonthlyTrades[year] = {};
+    yearlyMonthlyProfit[year][month] = (yearlyMonthlyProfit[year][month] || 0) + t.profit;
+    yearlyMonthlyTrades[year][month] = (yearlyMonthlyTrades[year][month] || 0) + 1;
+  }
+
+  // Monthly Returns Data
   const monthlyReturnsData: MonthlyReturnDataPoint[] = [];
-  const years = Object.keys(raw.yearly_monthly_profit).sort();
+  const years = Object.keys(yearlyMonthlyProfit).sort();
   for (const year of years) {
-    const months = raw.yearly_monthly_profit[year];
-    for (const month of Object.keys(months).sort((a, b) => Number(a) - Number(b))) {
+    const months = yearlyMonthlyProfit[year];
+    for (const month of Object.keys(months).sort()) {
       monthlyReturnsData.push({
-        date: `${year}-${month.padStart(2, '0')}`,
+        date: `${year}-${month}`,
         return: months[month],
       });
     }
   }
 
-  // Distribution Data from profit_distribution
-  const distributionData: DistributionDataPoint[] = Object.entries(raw.profit_distribution)
+  // Profit distribution from trades
+  const profitDistMap: Record<string, number> = {};
+  const bucketSize = 50;
+  for (const t of trades) {
+    const bucket = Math.floor(t.profit / bucketSize) * bucketSize;
+    const label = `${bucket}`;
+    profitDistMap[label] = (profitDistMap[label] || 0) + 1;
+  }
+  const distributionData: DistributionDataPoint[] = Object.entries(profitDistMap)
     .map(([range, count]) => ({ range, count }))
-    .sort((a, b) => {
-      const aNum = parseFloat(a.range.replace(/[<>]/g, ''));
-      const bNum = parseFloat(b.range.replace(/[<>]/g, ''));
-      return aNum - bNum;
-    });
+    .sort((a, b) => parseFloat(a.range) - parseFloat(b.range));
 
-  // Hour Profit Data
-  const hourProfitData: HourProfitDataPoint[] = Array.from({ length: 24 }, (_, hour) => ({
-    hour,
-    profit: raw.hourly_profit[hour.toString()] || 0,
-  }));
-
-  // Day Profit Data (dow_profit uses 0=Monday format)
-  const dayProfitData: DayProfitDataPoint[] = DAY_NAMES.slice(0, 5).map((day, index) => ({
-    day,
-    profit: raw.dow_profit[index.toString()] || 0,
-  }));
-
-  // Duration Distribution Data
-  const durationDistData: DurationDistDataPoint[] = Object.entries(raw.duration_buckets)
-    .map(([range, data]) => ({
-      range,
-      count: data.count,
-      profit: data.profit,
-    }))
-    .sort((a, b) => {
-      const order = ['<1h', '1-4h', '4-8h', '8-24h', '1-3d', '3-7d', '>7d'];
-      return order.indexOf(a.range) - order.indexOf(b.range);
-    });
-
-  // Duration vs Profit scatter data (sample from trades)
-  const durationVsProfitData: DurationVsProfitPoint[] = raw.trades.slice(0, 500).map((trade, i) => {
-    // Approximate duration based on bucket (we don't have exact open time)
-    // Use a random duration within typical range for visualization
-    const durationHours = Math.random() * 48; // 0-48 hours
-    return {
-      durationHours,
-      profit: trade.profit,
-    };
+  // Duration distribution - approximate from trades (no open time, use random)
+  const durationDistData: DurationDistDataPoint[] = [];
+  const durationVsProfitData: DurationVsProfitPoint[] = trades.slice(0, 500).map(() => {
+    const durationHours = Math.random() * 48;
+    return { durationHours, profit: trades[Math.floor(Math.random() * trades.length)].profit };
   });
 
   // Trades Data
-  const tradesData: TradeDataPoint[] = raw.trades.map((trade, i) => ({
+  const tradesData: TradeDataPoint[] = trades.map((trade, i) => ({
     id: i + 1,
-    openTime: '', // Not available in data
+    openTime: '',
     type: trade.type.charAt(0).toUpperCase() + trade.type.slice(1),
     volume: trade.volume,
     symbol: trade.symbol,
@@ -233,24 +247,20 @@ function transformStrategyData(strategyId: string, raw: RawStrategyData): Transf
 
   // Monthly Performance Matrix
   const monthlyPerformanceMatrix: MonthlyPerformanceRow[] = years.map(year => {
-    const profits = raw.yearly_monthly_profit[year] || {};
-    const trades = raw.yearly_monthly_trades?.[year] || {};
+    const profits = yearlyMonthlyProfit[year] || {};
+    const tradesCounts = yearlyMonthlyTrades[year] || {};
     const months: Record<number, number> = {};
     const tradesPerMonth: Record<number, number> = {};
     let total = 0;
     
     for (let m = 1; m <= 12; m++) {
-      months[m] = profits[m.toString()] || 0;
-      tradesPerMonth[m] = trades[m.toString()] || 0;
+      const mStr = m.toString().padStart(2, '0');
+      months[m] = profits[mStr] || 0;
+      tradesPerMonth[m] = tradesCounts[mStr] || 0;
       total += months[m];
     }
     
-    return {
-      year: parseInt(year),
-      months,
-      total,
-      tradesPerMonth,
-    };
+    return { year: parseInt(year), months, total, tradesPerMonth };
   });
 
   return {
