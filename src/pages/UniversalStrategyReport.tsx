@@ -11,10 +11,12 @@ import DurationVsProfitScatter from "@/components/backtest/charts/DurationVsProf
 import DurationDistributionChart from "@/components/backtest/charts/DurationDistributionChart";
 import TradesTable from "@/components/backtest/TradesTable";
 import StrategySelector from "@/components/backtest/StrategySelector";
+import { getStrategyById } from "@/config/strategies";
 
 const UniversalStrategyReport = () => {
   const { strategyId } = useParams<{ strategyId: string }>();
   const normalizedId = strategyId?.toLowerCase() || '';
+  const strategyConfig = getStrategyById(normalizedId);
   const { data, isLoading, error } = useUniversalStrategyData(normalizedId);
 
   if (error) {
@@ -69,7 +71,7 @@ const UniversalStrategyReport = () => {
               <span className="text-primary">717</span>
               <span className="text-muted-foreground ml-2">Analytics</span>
             </h1>
-            <p className="text-muted-foreground mt-1">Backtest Analysis Report - {strategyId}</p>
+            <p className="text-muted-foreground mt-1">{strategyConfig?.name || strategyId} - Backtest Analysis Report</p>
             <p className="text-xs text-muted-foreground font-mono mt-2">
               Generated: {data.reportInfo.generatedDate}
             </p>
@@ -83,7 +85,7 @@ const UniversalStrategyReport = () => {
           <div className="flex flex-wrap justify-center gap-4 md:gap-8 text-sm">
             <div className="text-center">
               <span className="text-muted-foreground text-xs block">EA</span>
-              <span className="font-medium">{data.reportInfo.ea}</span>
+              <span className="font-medium">EA {strategyConfig?.name || data.reportInfo.ea}</span>
             </div>
             <div className="hidden md:block w-px h-8 bg-border" />
             <div className="text-center">
