@@ -48,7 +48,7 @@ const StrategySelector = ({ currentStrategy, context }: StrategySelectorProps) =
       </DropdownMenuTrigger>
       <DropdownMenuContent 
         align="start" 
-        className="w-56 bg-popover border border-border z-50"
+        className="w-56 bg-popover border border-border z-50 max-h-[70vh] overflow-y-auto"
       >
         {strategies.map((strategy) => (
           <DropdownMenuItem
