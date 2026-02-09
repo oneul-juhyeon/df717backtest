@@ -54,14 +54,10 @@ const TradesTable = ({ data, totalTrades }: Props) => {
         <table className="w-full text-xs">
           <thead className="bg-muted/50">
             <tr>
-              <th className="px-3 py-2 text-left font-medium text-muted-foreground">Open Time</th>
+              <th className="px-3 py-2 text-left font-medium text-muted-foreground">Close Time</th>
               <th className="px-3 py-2 text-left font-medium text-muted-foreground">Type</th>
               <th className="px-3 py-2 text-right font-medium text-muted-foreground">Volume</th>
               <th className="px-3 py-2 text-left font-medium text-muted-foreground">Symbol</th>
-              <th className="px-3 py-2 text-right font-medium text-muted-foreground">Open Price</th>
-              <th className="px-3 py-2 text-right font-medium text-muted-foreground">S/L</th>
-              <th className="px-3 py-2 text-right font-medium text-muted-foreground">T/P</th>
-              <th className="px-3 py-2 text-left font-medium text-muted-foreground">Close Time</th>
               <th className="px-3 py-2 text-right font-medium text-muted-foreground">Close Price</th>
               <th className="px-3 py-2 text-right font-medium text-muted-foreground">Commission</th>
               <th className="px-3 py-2 text-right font-medium text-muted-foreground">Swap</th>
@@ -72,7 +68,7 @@ const TradesTable = ({ data, totalTrades }: Props) => {
             {paginatedData.length > 0 ? (
               paginatedData.map((trade) => (
                 <tr key={trade.id} className="hover:bg-muted/30">
-                  <td className="px-3 py-2 font-mono">{trade.openTime}</td>
+                  <td className="px-3 py-2 font-mono">{trade.closeTime || trade.openTime}</td>
                   <td className="px-3 py-2">
                     <span className={trade.type.toLowerCase() === 'buy' ? 'text-success' : 'text-destructive'}>
                       {trade.type}
@@ -80,11 +76,7 @@ const TradesTable = ({ data, totalTrades }: Props) => {
                   </td>
                   <td className="px-3 py-2 text-right font-mono">{trade.volume.toFixed(2)}</td>
                   <td className="px-3 py-2">{trade.symbol}</td>
-                  <td className="px-3 py-2 text-right font-mono">{trade.openPrice.toFixed(2)}</td>
-                  <td className="px-3 py-2 text-right font-mono text-muted-foreground">{trade.sl > 0 ? trade.sl.toFixed(2) : '-'}</td>
-                  <td className="px-3 py-2 text-right font-mono text-muted-foreground">{trade.tp > 0 ? trade.tp.toFixed(2) : '-'}</td>
-                  <td className="px-3 py-2 font-mono">{trade.closeTime}</td>
-                  <td className="px-3 py-2 text-right font-mono">{trade.closePrice.toFixed(2)}</td>
+                  <td className="px-3 py-2 text-right font-mono">{trade.closePrice > 0 ? trade.closePrice.toFixed(2) : (trade.openPrice > 0 ? trade.openPrice.toFixed(2) : '-')}</td>
                   <td className="px-3 py-2 text-right font-mono text-muted-foreground">{trade.commission.toFixed(2)}</td>
                   <td className="px-3 py-2 text-right font-mono text-muted-foreground">{trade.swap.toFixed(2)}</td>
                   <td className={`px-3 py-2 text-right font-mono ${trade.profit >= 0 ? 'text-success' : 'text-destructive'}`}>
@@ -94,7 +86,7 @@ const TradesTable = ({ data, totalTrades }: Props) => {
               ))
             ) : (
               <tr>
-                <td colSpan={12} className="px-3 py-8 text-center text-muted-foreground">
+                <td colSpan={8} className="px-3 py-8 text-center text-muted-foreground">
                   Loading trade data from backtest report...
                 </td>
               </tr>
