@@ -26,17 +26,25 @@ async function loadAllStrategiesData(): Promise<AllStrategiesJson> {
   if (loadingPromise) return loadingPromise;
   
   loadingPromise = (async () => {
-    // Try v2 ZIP first, then fall back to v1 JSON
+    // Try v2 JSON first, then v2 ZIP, then fall back to v1 JSON
+    try {
+      const jsonRes = await fetch('/all_strategies_full_data_v2.json');
+      if (jsonRes.ok) {
+        const data: AllStrategiesJson = await jsonRes.json();
+        cachedData = data;
+        return data;
+      }
+    } catch (e) {
+      console.warn('Failed to load v2 JSON, trying ZIP:', e);
+    }
+
     try {
       const zipRes = await fetch('/all_strategies_full_data_v2.zip');
       if (zipRes.ok) {
         const zipBlob = await zipRes.blob();
         const zip = await JSZip.loadAsync(zipBlob);
-        
-        // Find the JSON file inside the ZIP
         const jsonFile = zip.file(/\.json$/i)[0];
         if (!jsonFile) throw new Error('No JSON file found in ZIP');
-        
         const jsonText = await jsonFile.async('text');
         const data: AllStrategiesJson = JSON.parse(jsonText);
         cachedData = data;
@@ -392,7 +400,9 @@ export function useAvailableStrategies() {
   useEffect(() => {
     loadAllStrategiesData()
       .then(data => {
-        setStrategies(data.metadata.strategy_list);
+        // v2 may not have strategy_list in metadata, derive from keys
+        const list = data.metadata?.strategy_list || Object.keys(data.strategies);
+        setStrategies(list);
         setIsLoading(false);
       })
       .catch(() => {
