@@ -26,11 +26,11 @@ async function loadAllStrategiesData(): Promise<AllStrategiesJson> {
   if (loadingPromise) return loadingPromise;
   
   loadingPromise = (async () => {
-    // Try strategies/v2 JSON first (has open_time for duration charts),
-    // then root v2 JSON, then v2 ZIP, then fall back to v1 JSON
+    // Try root v2 JSON first (has open_time for duration charts),
+    // then strategies subfolder, then v2 ZIP, then fall back to v1 JSON
     const jsonPaths = [
-      '/strategies/all_strategies_full_data_v2.json',
       '/all_strategies_full_data_v2.json',
+      '/strategies/all_strategies_full_data_v2.json',
     ];
 
     for (const path of jsonPaths) {
