@@ -26,16 +26,25 @@ async function loadAllStrategiesData(): Promise<AllStrategiesJson> {
   if (loadingPromise) return loadingPromise;
   
   loadingPromise = (async () => {
-    // Try v2 JSON first, then v2 ZIP, then fall back to v1 JSON
-    try {
-      const jsonRes = await fetch('/all_strategies_full_data_v2.json');
-      if (jsonRes.ok) {
-        const data: AllStrategiesJson = await jsonRes.json();
-        cachedData = data;
-        return data;
+    // Try strategies/v2 JSON first (has open_time for duration charts),
+    // then root v2 JSON, then v2 ZIP, then fall back to v1 JSON
+    const jsonPaths = [
+      '/strategies/all_strategies_full_data_v2.json',
+      '/all_strategies_full_data_v2.json',
+    ];
+
+    for (const path of jsonPaths) {
+      try {
+        const jsonRes = await fetch(path);
+        if (jsonRes.ok) {
+          const data: AllStrategiesJson = await jsonRes.json();
+          cachedData = data;
+          console.log(`Loaded strategy data from ${path}`);
+          return data;
+        }
+      } catch (e) {
+        console.warn(`Failed to load ${path}:`, e);
       }
-    } catch (e) {
-      console.warn('Failed to load v2 JSON, trying ZIP:', e);
     }
 
     try {
