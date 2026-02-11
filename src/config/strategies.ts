@@ -16,7 +16,7 @@ const jsonStrategies: Strategy[] = [
   {
     id: "dfcovenant",
     name: "DFcovenant",
-    description: "Precision Gold Trading Strategy",
+    description: "Professional Gold Trading Expert Advisor",
     landingPath: "/",
     reportPath: "/backtest-report",
     symbol: "XAUUSD",
@@ -37,7 +37,7 @@ const jsonStrategies: Strategy[] = [
     description: "Diversified Currency Strategy",
     landingPath: "/dfmate",
     reportPath: "/dfmate/backtest-report",
-    symbol: "Multi",
+    symbol: "XAUUSD",
     period: "H1",
   },
   {
@@ -46,7 +46,7 @@ const jsonStrategies: Strategy[] = [
     description: "Elegant Market Strategy",
     landingPath: "/dfbeauty",
     reportPath: "/dfbeauty/backtest-report",
-    symbol: "Multi",
+    symbol: "BTCUSD",
     period: "H1",
   },
   {
@@ -55,8 +55,8 @@ const jsonStrategies: Strategy[] = [
     description: "Foundational Trading Strategy",
     landingPath: "/dfadam",
     reportPath: "/dfadam/backtest-report",
-    symbol: "Multi",
-    period: "H1",
+    symbol: "XAUUSD",
+    period: "M30",
   },
   {
     id: "dfreap",
@@ -64,7 +64,7 @@ const jsonStrategies: Strategy[] = [
     description: "Harvest Strategy",
     landingPath: "/dfreap",
     reportPath: "/dfreap/backtest-report",
-    symbol: "Multi",
+    symbol: "XAUUSD",
     period: "H1",
   },
   {
@@ -73,8 +73,8 @@ const jsonStrategies: Strategy[] = [
     description: "Strength-Based Strategy",
     landingPath: "/dfboaz",
     reportPath: "/dfboaz/backtest-report",
-    symbol: "Multi",
-    period: "H1",
+    symbol: "XAUUSD",
+    period: "D1",
   },
   {
     id: "dfharvest",
@@ -82,8 +82,8 @@ const jsonStrategies: Strategy[] = [
     description: "Yield Optimization Strategy",
     landingPath: "/dfharvest",
     reportPath: "/dfharvest/backtest-report",
-    symbol: "Multi",
-    period: "H1",
+    symbol: "XAUUSD",
+    period: "M5",
   },
   {
     id: "dftrust",
@@ -100,7 +100,7 @@ const jsonStrategies: Strategy[] = [
     description: "Agile Trading Strategy",
     landingPath: "/dflight",
     reportPath: "/dflight/backtest-report",
-    symbol: "Multi",
+    symbol: "XAUUSD",
     period: "H1",
   },
   {
@@ -109,8 +109,8 @@ const jsonStrategies: Strategy[] = [
     description: "Vision-Based Strategy",
     landingPath: "/dfsight",
     reportPath: "/dfsight/backtest-report",
-    symbol: "Multi",
-    period: "H1",
+    symbol: "XAUUSD",
+    period: "M15",
   },
   {
     id: "dfknight",
@@ -118,7 +118,7 @@ const jsonStrategies: Strategy[] = [
     description: "Strategic Defense Strategy",
     landingPath: "/dfknight",
     reportPath: "/dfknight/backtest-report",
-    symbol: "Multi",
+    symbol: "XAUUSD",
     period: "H1",
   },
   {
@@ -127,8 +127,8 @@ const jsonStrategies: Strategy[] = [
     description: "High-Power Trading Strategy",
     landingPath: "/dfpower",
     reportPath: "/dfpower/backtest-report",
-    symbol: "Multi",
-    period: "H1",
+    symbol: "XAUUSD",
+    period: "M30",
   },
   {
     id: "dfgravity",

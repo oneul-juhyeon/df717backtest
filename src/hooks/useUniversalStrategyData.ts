@@ -72,6 +72,16 @@ const STRATEGY_KEY_MAP: Record<string, string> = {
 
 const KNOWN_SYMBOLS = ['XAUUSD', 'BTCUSD', 'AUDCAD', 'USTEC'];
 
+// Normalize non-standard symbol names from JSON
+function normalizeSymbol(symbol: string): string {
+  if (!symbol) return '';
+  const upper = symbol.toUpperCase();
+  if (KNOWN_SYMBOLS.includes(upper)) return upper;
+  if (upper.includes('XAU') || upper.includes('GOLD')) return 'XAUUSD';
+  if (upper.includes('BTC') || upper.includes('BITCOIN')) return 'BTCUSD';
+  return symbol;
+}
+
 const DAY_NAMES = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 const DOW_MAP: Record<number, string> = {
   0: 'Monday',
@@ -86,8 +96,8 @@ const DOW_MAP: Record<number, string> = {
 function transformStrategyData(strategyId: string, raw: RawStrategyData): TransformedStrategyData {
   const currencySymbol = raw.currency === 'EUR' ? '€' : '$';
 
-  // Derive symbol from trades if raw.symbol is empty
-  let resolvedSymbol = raw.symbol;
+  // Normalize and resolve symbol
+  let resolvedSymbol = normalizeSymbol(raw.symbol);
   if (!resolvedSymbol && raw.trades?.length > 0) {
     const symbolsInTrades = [...new Set(raw.trades.map(t => t.symbol).filter(Boolean))];
     resolvedSymbol = symbolsInTrades.length === 1 ? symbolsInTrades[0] : symbolsInTrades.join(', ');
