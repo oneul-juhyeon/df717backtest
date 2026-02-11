@@ -34,13 +34,13 @@ const Index = () => {
                 <span className="text-foreground">{strategy?.name.replace('DF', '') || 'covenant'}</span>
               </h1>
               <p className="text-lg text-white/60 max-w-2xl mx-auto font-light">
-                {strategy?.description || 'Professional Gold Trading Expert Advisor'}
+                Professional Gold Trading Expert Advisor
               </p>
             </div>
             
             {/* Description */}
             <p className="text-center text-white/50 max-w-3xl mx-auto mb-12 font-light leading-relaxed">
-              {data ? `Systematic trading approach with ${data.keyStats.totalTrades} trades analyzed.` : 'Loading strategy data...'}
+              Advanced algorithmic trading system designed for XAUUSD with robust risk management and consistent performance across market conditions.
             </p>
             
             {/* Key metrics from JSON data */}
