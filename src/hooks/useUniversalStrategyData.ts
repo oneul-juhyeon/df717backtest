@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import JSZip from 'jszip';
 import type {
   AllStrategiesJson,
   RawStrategyData,
@@ -24,15 +25,34 @@ async function loadAllStrategiesData(): Promise<AllStrategiesJson> {
   
   if (loadingPromise) return loadingPromise;
   
-  loadingPromise = fetch('/strategies/all_strategies_data.json')
-    .then(res => {
-      if (!res.ok) throw new Error('Failed to load strategies data');
-      return res.json();
-    })
-    .then(data => {
-      cachedData = data;
-      return data;
-    });
+  loadingPromise = (async () => {
+    // Try v2 ZIP first, then fall back to v1 JSON
+    try {
+      const zipRes = await fetch('/all_strategies_full_data_v2.zip');
+      if (zipRes.ok) {
+        const zipBlob = await zipRes.blob();
+        const zip = await JSZip.loadAsync(zipBlob);
+        
+        // Find the JSON file inside the ZIP
+        const jsonFile = zip.file(/\.json$/i)[0];
+        if (!jsonFile) throw new Error('No JSON file found in ZIP');
+        
+        const jsonText = await jsonFile.async('text');
+        const data: AllStrategiesJson = JSON.parse(jsonText);
+        cachedData = data;
+        return data;
+      }
+    } catch (e) {
+      console.warn('Failed to load v2 ZIP, falling back to v1 JSON:', e);
+    }
+
+    // Fallback to original JSON
+    const res = await fetch('/strategies/all_strategies_data.json');
+    if (!res.ok) throw new Error('Failed to load strategies data');
+    const data: AllStrategiesJson = await res.json();
+    cachedData = data;
+    return data;
+  })();
   
   return loadingPromise;
 }
