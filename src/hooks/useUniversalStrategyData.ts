@@ -65,6 +65,13 @@ async function loadAllStrategiesData(): Promise<AllStrategiesJson> {
   return loadingPromise;
 }
 
+// Map strategy IDs to JSON keys when they differ
+const STRATEGY_KEY_MAP: Record<string, string> = {
+  dfcovenant: 'DFkara',
+};
+
+const KNOWN_SYMBOLS = ['XAUUSD', 'BTCUSD', 'AUDCAD', 'USTEC'];
+
 const DAY_NAMES = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 const DOW_MAP: Record<number, string> = {
   0: 'Monday',
@@ -79,10 +86,18 @@ const DOW_MAP: Record<number, string> = {
 function transformStrategyData(strategyId: string, raw: RawStrategyData): TransformedStrategyData {
   const currencySymbol = raw.currency === 'EUR' ? '€' : '$';
 
+  // Derive symbol from trades if raw.symbol is empty
+  let resolvedSymbol = raw.symbol;
+  if (!resolvedSymbol && raw.trades?.length > 0) {
+    const symbolsInTrades = [...new Set(raw.trades.map(t => t.symbol).filter(Boolean))];
+    resolvedSymbol = symbolsInTrades.length === 1 ? symbolsInTrades[0] : symbolsInTrades.join(', ');
+  }
+  if (!resolvedSymbol) resolvedSymbol = 'Multi';
+
   // Report Info
   const reportInfo = {
     ea: raw.ea_name,
-    symbol: raw.symbol,
+    symbol: resolvedSymbol,
     period: raw.period,
     dates: `${raw.start_date} - ${raw.end_date}`,
     deposit: `${currencySymbol}${raw.deposit.toLocaleString()}`,
@@ -253,7 +268,33 @@ function transformStrategyData(strategyId: string, raw: RawStrategyData): Transf
   let durationDistData: DurationDistDataPoint[] = [];
   const durationVsProfitData: DurationVsProfitPoint[] = [];
 
-  const tradesWithDuration = trades.filter(t => t.duration_hours != null);
+  // Compute duration_hours from available fields if missing
+  const tradesWithDuration = trades.filter(t => {
+    if (t.duration_hours != null) return true;
+    // Derive from other duration fields
+    if (t.duration_seconds != null) {
+      t.duration_hours = t.duration_seconds / 3600;
+      return true;
+    }
+    if (t.duration_minutes != null) {
+      t.duration_hours = t.duration_minutes / 60;
+      return true;
+    }
+    if (t.duration_days != null) {
+      t.duration_hours = t.duration_days * 24;
+      return true;
+    }
+    // Derive from open_time and close_time
+    if (t.open_time && t.close_time) {
+      const openMs = new Date(t.open_time).getTime();
+      const closeMs = new Date(t.close_time).getTime();
+      if (!isNaN(openMs) && !isNaN(closeMs)) {
+        t.duration_hours = (closeMs - openMs) / 3600000;
+        return true;
+      }
+    }
+    return false;
+  });
   if (tradesWithDuration.length > 0) {
     // Build duration buckets from actual trade data
     const buckets: Record<string, { count: number; profit: number }> = {};
@@ -358,10 +399,13 @@ export function useUniversalStrategyData(strategyId: string) {
       try {
         const allData = await loadAllStrategiesData();
         
-        // Find strategy by case-insensitive match
-        const strategyKey = Object.keys(allData.strategies).find(
-          key => key.toLowerCase() === strategyId.toLowerCase()
-        );
+        // Check mapped key first, then case-insensitive match
+        const mappedKey = STRATEGY_KEY_MAP[strategyId.toLowerCase()];
+        const strategyKey = mappedKey
+          ? Object.keys(allData.strategies).find(k => k.toLowerCase() === mappedKey.toLowerCase())
+          : Object.keys(allData.strategies).find(
+              key => key.toLowerCase() === strategyId.toLowerCase()
+            );
         
         if (!strategyKey) {
           throw new Error(`Strategy "${strategyId}" not found`);

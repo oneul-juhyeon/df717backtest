@@ -1,6 +1,6 @@
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useBacktestData } from "@/hooks/useBacktestData";
+import { useUniversalStrategyData } from "@/hooks/useUniversalStrategyData";
 import BacktestEquityCurveChart from "@/components/backtest/charts/BacktestEquityCurveChart";
 import BacktestDailyPnLChart from "@/components/backtest/charts/BacktestDailyPnLChart";
 import BacktestMonthlyReturnsChart from "@/components/backtest/charts/BacktestMonthlyReturnsChart";
@@ -10,23 +10,39 @@ import ProfitByDayChart from "@/components/backtest/charts/ProfitByDayChart";
 import DurationVsProfitScatter from "@/components/backtest/charts/DurationVsProfitScatter";
 import DurationDistributionChart from "@/components/backtest/charts/DurationDistributionChart";
 import TradesTable from "@/components/backtest/TradesTable";
-import { reportInfo, advancedStats, longShortData, drawdownsData, monthlyPerformanceMatrix } from "@/data/backtestData";
 import StrategySelector from "@/components/backtest/StrategySelector";
 
 const BacktestReport = () => {
-  const { 
-    equityData, 
-    dailyPnLData, 
-    monthlyReturnsData, 
-    distributionData,
-    hourProfitData,
-    dayProfitData,
-    durationVsProfitData,
-    durationDistData,
-    tradesData,
-    totalTrades,
-    isLoading 
-  } = useBacktestData();
+  const strategyId = "dfcovenant";
+  const { data, isLoading, error } = useUniversalStrategyData(strategyId);
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-destructive mb-2">Error Loading Strategy</h1>
+          <p className="text-muted-foreground">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isLoading || !data) {
+    return (
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4" />
+          <p className="text-muted-foreground">Loading strategy data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const currencySymbol = data.currency === 'EUR' ? '€' : '$';
+  const formatCurrency = (value: number) => {
+    const sign = value >= 0 ? '+' : '';
+    return `${sign}${currencySymbol}${Math.abs(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -41,7 +57,7 @@ const BacktestReport = () => {
               <ArrowLeft className="w-4 h-4" />
               Back to Overview
             </Link>
-            <StrategySelector currentStrategy="dfcovenant" context="report" />
+            <StrategySelector currentStrategy={strategyId} context="report" />
           </div>
           <div className="text-center">
             <h1 className="text-2xl font-bold">
@@ -49,9 +65,9 @@ const BacktestReport = () => {
               <span className="text-primary">717</span>
               <span className="text-muted-foreground ml-2">Analytics</span>
             </h1>
-            <p className="text-muted-foreground mt-1">Backtest Analysis Report - DFcovenant</p>
+            <p className="text-muted-foreground mt-1">DFcovenant - Backtest Analysis Report</p>
             <p className="text-xs text-muted-foreground font-mono mt-2">
-              Generated: {reportInfo.generatedDate}
+              Generated: {data.reportInfo.generatedDate}
             </p>
           </div>
         </div>
@@ -63,37 +79,37 @@ const BacktestReport = () => {
           <div className="flex flex-wrap justify-center gap-4 md:gap-8 text-sm">
             <div className="text-center">
               <span className="text-muted-foreground text-xs block">EA</span>
-              <span className="font-medium">{reportInfo.ea}</span>
+              <span className="font-medium">DFcovenant</span>
             </div>
             <div className="hidden md:block w-px h-8 bg-border" />
             <div className="text-center">
               <span className="text-muted-foreground text-xs block">Symbol</span>
-              <span className="font-medium">{reportInfo.symbol}</span>
+              <span className="font-medium">{data.reportInfo.symbol}</span>
             </div>
             <div className="hidden md:block w-px h-8 bg-border" />
             <div className="text-center">
               <span className="text-muted-foreground text-xs block">Period</span>
-              <span className="font-medium">{reportInfo.period}</span>
+              <span className="font-medium">{data.reportInfo.period}</span>
             </div>
             <div className="hidden md:block w-px h-8 bg-border" />
             <div className="text-center">
               <span className="text-muted-foreground text-xs block">Dates</span>
-              <span className="font-medium">{reportInfo.dates}</span>
+              <span className="font-medium">{data.reportInfo.dates}</span>
             </div>
             <div className="hidden md:block w-px h-8 bg-border" />
             <div className="text-center">
               <span className="text-muted-foreground text-xs block">Deposit</span>
-              <span className="font-medium">{reportInfo.deposit}</span>
+              <span className="font-medium">{data.reportInfo.deposit}</span>
             </div>
             <div className="hidden md:block w-px h-8 bg-border" />
             <div className="text-center">
               <span className="text-muted-foreground text-xs block">Leverage</span>
-              <span className="font-medium">{reportInfo.leverage}</span>
+              <span className="font-medium">{data.reportInfo.leverage}</span>
             </div>
             <div className="hidden md:block w-px h-8 bg-border" />
             <div className="text-center">
               <span className="text-muted-foreground text-xs block">Trades</span>
-              <span className="font-medium">{reportInfo.trades}</span>
+              <span className="font-medium">{data.reportInfo.trades}</span>
             </div>
           </div>
         </div>
@@ -104,31 +120,33 @@ const BacktestReport = () => {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
           <div className="bg-card border border-border rounded-lg p-4 text-center">
             <p className="text-xs text-muted-foreground mb-1">NET PROFIT</p>
-            <p className="text-xl font-bold text-success">+$722,988.07</p>
-            <p className="text-xs text-muted-foreground mt-1">988 trades</p>
+            <p className={`text-xl font-bold ${data.keyStats.netProfit >= 0 ? 'text-success' : 'text-destructive'}`}>
+              {formatCurrency(data.keyStats.netProfit)}
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">{data.keyStats.totalTrades} trades</p>
           </div>
           <div className="bg-card border border-border rounded-lg p-4 text-center">
             <p className="text-xs text-muted-foreground mb-1">WIN RATE</p>
-            <p className="text-xl font-bold text-primary">66.0%</p>
-            <p className="text-xs text-muted-foreground mt-1">652W / 336L</p>
+            <p className="text-xl font-bold text-primary">{data.keyStats.winRate.toFixed(1)}%</p>
+            <p className="text-xs text-muted-foreground mt-1">{data.keyStats.winTrades}W / {data.keyStats.lossTrades}L</p>
           </div>
           <div className="bg-card border border-border rounded-lg p-4 text-center">
             <p className="text-xs text-muted-foreground mb-1">PROFIT FACTOR</p>
-            <p className="text-xl font-bold text-success">3.31</p>
-            <p className="text-xs text-muted-foreground mt-1">GP: $1,032,652.68</p>
+            <p className="text-xl font-bold text-success">{data.keyStats.profitFactor.toFixed(2)}</p>
+            <p className="text-xs text-muted-foreground mt-1">GP: {currencySymbol}{data.keyStats.grossProfit.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
           </div>
           <div className="bg-card border border-border rounded-lg p-4 text-center">
             <p className="text-xs text-muted-foreground mb-1">MAX DRAWDOWN</p>
-            <p className="text-xl font-bold text-destructive">11.2%</p>
-            <p className="text-xs text-muted-foreground mt-1">-$32,502.37</p>
+            <p className="text-xl font-bold text-destructive">{data.keyStats.maxDDPercent.toFixed(1)}%</p>
+            <p className="text-xs text-muted-foreground mt-1">-{currencySymbol}{Math.abs(data.keyStats.maxDDAbs).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
           </div>
           <div className="bg-card border border-border rounded-lg p-4 text-center">
             <p className="text-xs text-muted-foreground mb-1">BEST TRADE</p>
-            <p className="text-xl font-bold text-success">+$36,945.05</p>
+            <p className="text-xl font-bold text-success">{formatCurrency(data.keyStats.bestTrade)}</p>
           </div>
           <div className="bg-card border border-border rounded-lg p-4 text-center">
             <p className="text-xs text-muted-foreground mb-1">WORST TRADE</p>
-            <p className="text-xl font-bold text-destructive">-$18,987.81</p>
+            <p className="text-xl font-bold text-destructive">{formatCurrency(data.keyStats.worstTrade)}</p>
           </div>
         </div>
 
@@ -138,25 +156,19 @@ const BacktestReport = () => {
           <div className="bg-card border border-border rounded-lg p-4">
             <h4 className="text-success font-semibold mb-3">Long (Buy)</h4>
             <div className="space-y-2 text-sm">
-              <div className="flex justify-between"><span className="text-muted-foreground">Trades</span><span>{longShortData.long.trades}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Win Rate</span><span>{longShortData.long.winRate}%</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Profit</span><span className="text-success">+${longShortData.long.profit.toLocaleString()}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Avg Profit</span><span className="text-success">+${longShortData.long.avgProfit.toLocaleString()}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Best</span><span className="text-success">+${longShortData.long.best.toLocaleString()}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Worst</span><span className="text-destructive">-${Math.abs(longShortData.long.worst).toLocaleString()}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Volume</span><span>{longShortData.long.volume.toLocaleString()}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Trades</span><span>{data.longShortData.long.trades}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Win Rate</span><span>{data.longShortData.long.winRate.toFixed(1)}%</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Profit</span><span className="text-success">{formatCurrency(data.longShortData.long.profit)}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Avg Profit</span><span className="text-success">{formatCurrency(data.longShortData.long.avgProfit)}</span></div>
             </div>
           </div>
           <div className="bg-card border border-border rounded-lg p-4">
             <h4 className="text-destructive font-semibold mb-3">Short (Sell)</h4>
             <div className="space-y-2 text-sm">
-              <div className="flex justify-between"><span className="text-muted-foreground">Trades</span><span>{longShortData.short.trades}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Win Rate</span><span>{longShortData.short.winRate}%</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Profit</span><span className="text-success">+${longShortData.short.profit.toLocaleString()}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Avg Profit</span><span className="text-success">+${longShortData.short.avgProfit.toLocaleString()}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Best</span><span className="text-success">+${longShortData.short.best.toLocaleString()}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Worst</span><span className="text-destructive">-${Math.abs(longShortData.short.worst).toLocaleString()}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Volume</span><span>{longShortData.short.volume.toLocaleString()}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Trades</span><span>{data.longShortData.short.trades}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Win Rate</span><span>{data.longShortData.short.winRate.toFixed(1)}%</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Profit</span><span className="text-success">{formatCurrency(data.longShortData.short.profit)}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Avg Profit</span><span className="text-success">{formatCurrency(data.longShortData.short.avgProfit)}</span></div>
             </div>
           </div>
         </div>
@@ -164,10 +176,8 @@ const BacktestReport = () => {
         {/* Equity Curve */}
         <div className="bg-card border border-border rounded-lg p-6 mb-6">
           <h3 className="text-lg font-semibold mb-4">Equity Curve</h3>
-          {isLoading ? (
-            <div className="h-[380px] flex items-center justify-center text-muted-foreground">Loading chart data...</div>
-          ) : equityData.length > 0 ? (
-            <BacktestEquityCurveChart data={equityData} />
+          {data.equityData.length > 0 ? (
+            <BacktestEquityCurveChart data={data.equityData} />
           ) : (
             <div className="h-[380px] flex items-center justify-center text-muted-foreground">No equity data available</div>
           )}
@@ -176,10 +186,8 @@ const BacktestReport = () => {
         {/* Daily P&L */}
         <div className="bg-card border border-border rounded-lg p-6 mb-6">
           <h3 className="text-lg font-semibold mb-4">Daily P&L</h3>
-          {isLoading ? (
-            <div className="h-[300px] flex items-center justify-center text-muted-foreground">Loading chart data...</div>
-          ) : dailyPnLData.length > 0 ? (
-            <BacktestDailyPnLChart data={dailyPnLData} />
+          {data.dailyPnLData.length > 0 ? (
+            <BacktestDailyPnLChart data={data.dailyPnLData} />
           ) : (
             <div className="h-[300px] flex items-center justify-center text-muted-foreground">No daily P&L data available</div>
           )}
@@ -189,20 +197,16 @@ const BacktestReport = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div className="bg-card border border-border rounded-lg p-6">
             <h3 className="text-lg font-semibold mb-4">Monthly Returns</h3>
-            {isLoading ? (
-              <div className="h-[274px] flex items-center justify-center text-muted-foreground">Loading...</div>
-            ) : monthlyReturnsData.length > 0 ? (
-              <BacktestMonthlyReturnsChart data={monthlyReturnsData} />
+            {data.monthlyReturnsData.length > 0 ? (
+              <BacktestMonthlyReturnsChart data={data.monthlyReturnsData} />
             ) : (
               <div className="h-[274px] flex items-center justify-center text-muted-foreground">No data available</div>
             )}
           </div>
           <div className="bg-card border border-border rounded-lg p-6">
             <h3 className="text-lg font-semibold mb-4">Distribution</h3>
-            {isLoading ? (
-              <div className="h-[274px] flex items-center justify-center text-muted-foreground">Loading...</div>
-            ) : distributionData.length > 0 ? (
-              <BacktestDistributionChart data={distributionData} />
+            {data.distributionData.length > 0 ? (
+              <BacktestDistributionChart data={data.distributionData} />
             ) : (
               <div className="h-[274px] flex items-center justify-center text-muted-foreground">No data available</div>
             )}
@@ -213,20 +217,16 @@ const BacktestReport = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div className="bg-card border border-border rounded-lg p-6">
             <h3 className="text-lg font-semibold mb-4">Profit by Hour</h3>
-            {isLoading ? (
-              <div className="h-[274px] flex items-center justify-center text-muted-foreground">Loading...</div>
-            ) : hourProfitData.length > 0 ? (
-              <ProfitByHourChart data={hourProfitData} />
+            {data.hourProfitData.length > 0 ? (
+              <ProfitByHourChart data={data.hourProfitData} />
             ) : (
               <div className="h-[274px] flex items-center justify-center text-muted-foreground">No data available</div>
             )}
           </div>
           <div className="bg-card border border-border rounded-lg p-6">
             <h3 className="text-lg font-semibold mb-4">Profit by Day of Week</h3>
-            {isLoading ? (
-              <div className="h-[274px] flex items-center justify-center text-muted-foreground">Loading...</div>
-            ) : dayProfitData.length > 0 ? (
-              <ProfitByDayChart data={dayProfitData} />
+            {data.dayProfitData.length > 0 ? (
+              <ProfitByDayChart data={data.dayProfitData} />
             ) : (
               <div className="h-[274px] flex items-center justify-center text-muted-foreground">No data available</div>
             )}
@@ -237,20 +237,16 @@ const BacktestReport = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div className="bg-card border border-border rounded-lg p-6">
             <h3 className="text-lg font-semibold mb-4">Duration vs Profit</h3>
-            {isLoading ? (
-              <div className="h-[320px] flex items-center justify-center text-muted-foreground">Loading...</div>
-            ) : durationVsProfitData.length > 0 ? (
-              <DurationVsProfitScatter data={durationVsProfitData} />
+            {data.durationVsProfitData.length > 0 ? (
+              <DurationVsProfitScatter data={data.durationVsProfitData} />
             ) : (
               <div className="h-[320px] flex items-center justify-center text-muted-foreground">No data available</div>
             )}
           </div>
           <div className="bg-card border border-border rounded-lg p-6">
             <h3 className="text-lg font-semibold mb-4">Duration Distribution</h3>
-            {isLoading ? (
-              <div className="h-[274px] flex items-center justify-center text-muted-foreground">Loading...</div>
-            ) : durationDistData.length > 0 ? (
-              <DurationDistributionChart data={durationDistData} />
+            {data.durationDistData.length > 0 ? (
+              <DurationDistributionChart data={data.durationDistData} />
             ) : (
               <div className="h-[274px] flex items-center justify-center text-muted-foreground">No data available</div>
             )}
@@ -263,140 +259,108 @@ const BacktestReport = () => {
           <div className="bg-card border border-border rounded-lg p-4">
             <h4 className="text-sm font-medium text-primary mb-3">Performance</h4>
             <div className="space-y-2 text-xs">
-              <div className="flex justify-between"><span className="text-muted-foreground">Net Profit</span><span className="text-success">+${advancedStats.performance.netProfit.toLocaleString()}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Gross Profit</span><span className="text-success">+${advancedStats.performance.grossProfit.toLocaleString()}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Gross Loss</span><span className="text-destructive">-${Math.abs(advancedStats.performance.grossLoss).toLocaleString()}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Profit Factor</span><span>{advancedStats.performance.profitFactor}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Expectancy</span><span className="text-success">+${advancedStats.performance.expectancy}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Sharpe Ratio</span><span>{advancedStats.performance.sharpeRatio}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Net Profit</span><span className="text-success">{formatCurrency(data.advancedStats.performance.netProfit)}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Gross Profit</span><span className="text-success">{formatCurrency(data.advancedStats.performance.grossProfit)}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Gross Loss</span><span className="text-destructive">{formatCurrency(data.advancedStats.performance.grossLoss)}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Profit Factor</span><span>{data.advancedStats.performance.profitFactor.toFixed(2)}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Expectancy</span><span className="text-success">{formatCurrency(data.advancedStats.performance.expectancy)}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Sharpe Ratio</span><span>{data.advancedStats.performance.sharpeRatio.toFixed(2)}</span></div>
             </div>
           </div>
           <div className="bg-card border border-border rounded-lg p-4">
             <h4 className="text-sm font-medium text-primary mb-3">Risk Ratios</h4>
             <div className="space-y-2 text-xs">
-              <div className="flex justify-between"><span className="text-muted-foreground">Sortino Ratio</span><span>{advancedStats.riskRatios.sortinoRatio}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Calmar Ratio</span><span>{advancedStats.riskRatios.calmarRatio}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Recovery Factor</span><span>{advancedStats.riskRatios.recoveryFactor}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Kelly Criterion</span><span>{advancedStats.riskRatios.kellyCriterion}%</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Risk/Reward</span><span>{advancedStats.riskRatios.riskReward}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Avg Duration</span><span>{advancedStats.riskRatios.avgDuration}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Sortino Ratio</span><span>{data.advancedStats.riskRatios.sortinoRatio.toFixed(2)}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Calmar Ratio</span><span>{data.advancedStats.riskRatios.calmarRatio.toFixed(2)}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Recovery Factor</span><span>{data.advancedStats.riskRatios.recoveryFactor.toFixed(2)}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Kelly Criterion</span><span>{data.advancedStats.riskRatios.kellyCriterion.toFixed(1)}%</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Risk/Reward</span><span>{data.advancedStats.riskRatios.riskReward.toFixed(2)}</span></div>
             </div>
           </div>
           <div className="bg-card border border-border rounded-lg p-4">
             <h4 className="text-sm font-medium text-primary mb-3">Trade Stats</h4>
             <div className="space-y-2 text-xs">
-              <div className="flex justify-between"><span className="text-muted-foreground">Total Trades</span><span>{advancedStats.tradeStats.totalTrades}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Win Rate</span><span>{advancedStats.tradeStats.winRate}%</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Winning</span><span>{advancedStats.tradeStats.winning}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Losing</span><span>{advancedStats.tradeStats.losing}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Breakeven</span><span>{advancedStats.tradeStats.breakeven}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Days Traded</span><span>{advancedStats.tradeStats.daysTraded}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Total Trades</span><span>{data.advancedStats.tradeStats.totalTrades}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Win Rate</span><span>{data.advancedStats.tradeStats.winRate.toFixed(1)}%</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Avg Win</span><span className="text-success">{formatCurrency(data.advancedStats.tradeStats.avgWin)}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Avg Loss</span><span className="text-destructive">{formatCurrency(data.advancedStats.tradeStats.avgLoss)}</span></div>
             </div>
           </div>
           <div className="bg-card border border-border rounded-lg p-4">
-            <h4 className="text-sm font-medium text-primary mb-3">Risk</h4>
+            <h4 className="text-sm font-medium text-primary mb-3">Drawdown</h4>
             <div className="space-y-2 text-xs">
-              <div className="flex justify-between"><span className="text-muted-foreground">Equity DD %</span><span className="text-destructive">{advancedStats.risk.equityDDPercent}%</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Balance DD %</span><span className="text-destructive">{advancedStats.risk.balanceDDPercent}%</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Max DD Days</span><span>{advancedStats.risk.maxDDDays}d</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Max Stagnation</span><span>{advancedStats.risk.maxStagnation}d</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Best Trade</span><span className="text-success">+${advancedStats.risk.bestTrade.toLocaleString()}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Worst Trade</span><span className="text-destructive">-${Math.abs(advancedStats.risk.worstTrade).toLocaleString()}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Max DD (Equity)</span><span className="text-destructive">{data.advancedStats.drawdown.maxDDEquity.toFixed(1)}%</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Max DD (Balance)</span><span className="text-destructive">{data.advancedStats.drawdown.maxDDBalance.toFixed(1)}%</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">DD Value (Eq)</span><span className="text-destructive">{formatCurrency(-data.advancedStats.drawdown.equityDDValue)}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">DD Value (Bal)</span><span className="text-destructive">{formatCurrency(-data.advancedStats.drawdown.balanceDDValue)}</span></div>
             </div>
           </div>
           <div className="bg-card border border-border rounded-lg p-4">
-            <h4 className="text-sm font-medium text-primary mb-3">Streaks & Costs</h4>
+            <h4 className="text-sm font-medium text-primary mb-3">Costs</h4>
             <div className="space-y-2 text-xs">
-              <div className="flex justify-between"><span className="text-muted-foreground">Win Streak</span><span>{advancedStats.streaksCosts.winStreak}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Loss Streak</span><span>{advancedStats.streaksCosts.lossStreak}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Commission</span><span className="text-destructive">-${Math.abs(advancedStats.streaksCosts.commission).toLocaleString()}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Swap</span><span className="text-destructive">-${Math.abs(advancedStats.streaksCosts.swap).toLocaleString()}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Total Volume</span><span>{advancedStats.streaksCosts.totalVolume}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Avg Volume</span><span>{advancedStats.streaksCosts.avgVolume}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Total Volume</span><span>{data.advancedStats.costs.totalVolume.toLocaleString()}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Commission</span><span className="text-destructive">{formatCurrency(data.advancedStats.costs.totalCommission)}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Swap</span><span className={data.advancedStats.costs.totalSwap >= 0 ? 'text-success' : 'text-destructive'}>{formatCurrency(data.advancedStats.costs.totalSwap)}</span></div>
             </div>
-          </div>
-        </div>
-
-        {/* Top 5 Drawdowns */}
-        <h3 className="text-lg font-semibold mb-4">Top 5 Drawdowns</h3>
-        <div className="bg-card border border-border rounded-lg overflow-hidden mb-8">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-muted/50">
-                <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">#</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Start</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Bottom</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Recovery</th>
-                  <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground">Depth</th>
-                  <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground">Depth %</th>
-                  <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground">Duration</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {drawdownsData.map((dd) => (
-                  <tr key={dd.rank} className="hover:bg-muted/30">
-                    <td className="px-4 py-3">{dd.rank}</td>
-                    <td className="px-4 py-3">{dd.start}</td>
-                    <td className="px-4 py-3">{dd.bottom}</td>
-                    <td className="px-4 py-3">{dd.recovery}</td>
-                    <td className="px-4 py-3 text-right text-destructive">-${Math.abs(dd.depth).toLocaleString()}</td>
-                    <td className="px-4 py-3 text-right text-destructive">{dd.depthPercent}%</td>
-                    <td className="px-4 py-3 text-right">{dd.duration}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
           </div>
         </div>
 
         {/* Monthly Performance Matrix */}
-        <h3 className="text-lg font-semibold mb-4">Monthly Performance Matrix</h3>
-        <div className="bg-card border border-border rounded-lg overflow-hidden mb-8">
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs">
-              <thead className="bg-muted/50">
-                <tr>
-                  <th className="px-3 py-2 text-left font-medium text-muted-foreground">Year</th>
-                  {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map(month => (
-                    <th key={month} className="px-2 py-2 text-right font-medium text-muted-foreground">{month}</th>
-                  ))}
-                  <th className="px-3 py-2 text-right font-medium text-muted-foreground">Total</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {monthlyPerformanceMatrix.map((row) => (
-                  <tr key={row.year} className="hover:bg-muted/30">
-                    <td className="px-3 py-2 font-medium">{row.year}</td>
-                    {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map(month => {
-                      const value = row[month as keyof typeof row] as number | null;
-                      return (
-                        <td key={month} className={`px-2 py-2 text-right ${value === null ? 'text-muted-foreground' : value >= 0 ? 'text-success' : 'text-destructive'}`}>
-                          {value === null ? '-' : `${value >= 0 ? '+' : ''}$${Math.abs(value).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`}
-                        </td>
-                      );
-                    })}
-                    <td className={`px-3 py-2 text-right font-medium ${row.total >= 0 ? 'text-success' : 'text-destructive'}`}>
-                      {row.total >= 0 ? '+' : ''}${Math.abs(row.total).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-                    </td>
+        {data.monthlyPerformanceMatrix.length > 0 && (
+          <>
+            <h3 className="text-lg font-semibold mb-4">Monthly Performance</h3>
+            <div className="bg-card border border-border rounded-lg p-4 mb-8 overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="border-b border-border">
+                    <th className="text-left py-2 px-2 text-muted-foreground">Year</th>
+                    {Array.from({ length: 12 }, (_, i) => (
+                      <th key={i} className="text-center py-2 px-1 text-muted-foreground">
+                        {['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][i]}
+                      </th>
+                    ))}
+                    <th className="text-center py-2 px-2 text-muted-foreground font-bold">Total</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+                </thead>
+                <tbody>
+                  {data.monthlyPerformanceMatrix.map((row) => (
+                    <tr key={row.year} className="border-b border-border/50">
+                      <td className="py-2 px-2 font-medium">{row.year}</td>
+                      {Array.from({ length: 12 }, (_, i) => {
+                        const val = row.months[i + 1] || 0;
+                        return (
+                          <td key={i} className={`text-center py-2 px-1 ${val > 0 ? 'text-success' : val < 0 ? 'text-destructive' : 'text-muted-foreground'}`}>
+                            {val !== 0 ? `${currencySymbol}${val.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}` : '-'}
+                          </td>
+                        );
+                      })}
+                      <td className={`text-center py-2 px-2 font-bold ${row.total > 0 ? 'text-success' : row.total < 0 ? 'text-destructive' : ''}`}>
+                        {currencySymbol}{row.total.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
 
         {/* Trades Table */}
-        <div className="mb-8">
-          <TradesTable data={tradesData.slice(0, 200)} totalTrades={totalTrades} />
-        </div>
+        <h3 className="text-lg font-semibold mb-4">Trade History</h3>
+        {data.tradesData.length > 0 ? (
+          <TradesTable data={data.tradesData} totalTrades={data.keyStats.totalTrades} />
+        ) : (
+          <div className="bg-card border border-border rounded-lg p-8 text-center text-muted-foreground">
+            No trade data available
+          </div>
+        )}
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border py-8">
+      <footer className="border-t border-border py-8 mt-16">
         <div className="container mx-auto px-6 text-center">
           <p className="text-sm text-muted-foreground">
-            © 2025 DF717. Past performance is not indicative of future results. Trading involves substantial risk. All analytics are provided for educational purposes only.
+            © 2025 DF717. Past performance is not indicative of future results. Trading involves substantial risk.
           </p>
         </div>
       </footer>

@@ -8,21 +8,20 @@ export interface Strategy {
   period: string;
 }
 
-// 기존 전략 (기존 데이터 파일 사용)
-const legacyStrategies: Strategy[] = [
+// 기존 전략 (레거시 - 없음)
+const legacyStrategies: Strategy[] = [];
+
+// 새 전략 (JSON 데이터 사용) - all_strategies_full_data_v2에서 로드
+const jsonStrategies: Strategy[] = [
   {
     id: "dfcovenant",
     name: "DFcovenant",
-    description: "Professional Gold Trading EA",
+    description: "Precision Gold Trading Strategy",
     landingPath: "/",
     reportPath: "/backtest-report",
     symbol: "XAUUSD",
     period: "H1",
   },
-];
-
-// 새 전략 (JSON 데이터 사용) - all_strategies_data.json에서 로드
-const jsonStrategies: Strategy[] = [
   {
     id: "dfart",
     name: "DFart",
@@ -148,15 +147,6 @@ const jsonStrategies: Strategy[] = [
     reportPath: "/dfaaron/backtest-report",
     symbol: "XAUUSD",
     period: "D1",
-  },
-  {
-    id: "dfkara",
-    name: "DFkara",
-    description: "Precision Gold Strategy",
-    landingPath: "/dfkara",
-    reportPath: "/dfkara/backtest-report",
-    symbol: "XAUUSD",
-    period: "H1",
   },
   {
     id: "dfpetha",
